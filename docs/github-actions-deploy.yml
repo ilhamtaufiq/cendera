@@ -1,3 +1,7 @@
+# NONAKTIF — file ini sengaja disimpan di luar .github/workflows/ sehingga tidak dijalankan GitHub.
+# Deploy dilakukan oleh Cloudflare Workers Builds. Untuk mengaktifkan kembali:
+#   git mv docs/github-actions-deploy.yml .github/workflows/deploy.yml
+
 # ALTERNATIF dari Cloudflare Workers Builds. Pakai salah satu saja agar tidak deploy dua kali.
 # Secrets repo yang dibutuhkan: CLOUDFLARE_API_TOKEN (izin "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID.
 # Variables repo (opsional, build-time): SITE_URL, PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_CF_BEACON_TOKEN.

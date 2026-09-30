@@ -61,7 +61,7 @@ cendera/
 │   ├── generate-images.mjs      # mockup proyek, cover blog, OG image, favicon (data dummy)
 │   └── postbuild.mjs            # indeks Pagefind + hash CSP
 ├── design/brand/                # file logo resmi (sumber)
-├── .github/workflows/deploy.yml # alternatif deploy via GitHub Actions
+├── docs/github-actions-deploy.yml # contoh workflow GitHub Actions (NONAKTIF)
 ├── astro.config.mjs
 ├── wrangler.jsonc
 ├── .dev.vars.example            # secret lokal (Worker)
@@ -217,11 +217,12 @@ diatur di `wrangler.jsonc` → `ratelimits`.
 
 Nama Worker di dashboard harus sama dengan `name` di `wrangler.jsonc` (`cendera-web`).
 
-### Opsi B — GitHub Actions
+### Opsi B — GitHub Actions (nonaktif)
 
-Workflow siap pakai di `.github/workflows/deploy.yml` (produksi dari `main`, preview untuk PR/branch lain).
-Tambahkan secret repo `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID`, serta variables `SITE_URL` dan
-`PUBLIC_TURNSTILE_SITE_KEY`. **Pakai salah satu opsi saja** agar tidak deploy ganda (hapus/disable workflow bila memakai Opsi A).
+Deploy memakai Workers Builds (Opsi A), jadi GitHub Actions **dinonaktifkan**. Contoh workflow disimpan di
+`docs/github-actions-deploy.yml` (produksi dari `main`, preview untuk PR). Untuk mengaktifkannya kembali,
+pindahkan ke `.github/workflows/deploy.yml`, tambahkan secret repo `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID`,
+lalu matikan deploy otomatis di Workers Builds agar tidak deploy ganda.
 
 ### Domain kustom
 
