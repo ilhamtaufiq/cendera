@@ -9,6 +9,7 @@ import Icon from '@/components/ui/Icon.astro';
 import '@/styles/prose.css';
 import { getPosts, formatDate, readingTime, relatedPosts, slugify, type Post } from '@/lib/content';
 import { SITE } from '@/data/site';
+import { absoluteUrl } from '@/lib/url';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -25,7 +26,7 @@ const d = post.data;
 const { Content, headings } = await render(post);
 const minutes = readingTime(post.body);
 const related = relatedPosts(post, posts);
-const url = new URL(Astro.url.pathname, Astro.site).href;
+const url = absoluteUrl(Astro.url.pathname, Astro.site);
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -53,7 +54,7 @@ const breadcrumbLd = {
   ],
 };
 ---
-<BaseLayout title={d.title} description={d.description} image={d.cover} imageAlt={d.coverAlt ?? d.title} type="article"
+<BaseLayout title={d.title} description={d.description} image={`/og/blog/${post.id}.jpg`} imageAlt={d.coverAlt ?? d.title} type="article"
   publishedTime={d.date} modifiedTime={d.updated} author={d.author} tags={d.tags} jsonLd={[articleLd, breadcrumbLd]}>
   <article data-pagefind-body data-pagefind-filter="tipe:blog">
     <header class="relative isolate overflow-hidden border-b border-border">

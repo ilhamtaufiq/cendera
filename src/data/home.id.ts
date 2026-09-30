@@ -16,7 +16,7 @@ export const hero = {
   titleLead: 'Dari ide menjadi produk digital yang',
   titleAccent: 'benar-benar dipakai.',
   subtitle:
-    'Cendera membantu instansi dan bisnis merancang, membangun, dan merawat aplikasi mobile, web, dan sistem kustom — rapi di balik layar, nyaman di tangan pengguna.',
+    'Studio teknologi & kreatif dari Cianjur yang membantu instansi dan bisnis merancang, membangun, dan merawat aplikasi mobile, web, dan sistem kustom — rapi di balik layar, nyaman di tangan pengguna.',
   highlights: ['Tim kecil, komunikasi langsung', 'Kode milik Anda', 'Dukungan pasca-rilis'],
 };
 

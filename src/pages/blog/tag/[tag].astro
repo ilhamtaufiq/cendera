@@ -11,7 +11,8 @@ export async function getStaticPaths() {
 const { all, posts } = Astro.props;
 const { tag } = Astro.params;
 ---
-<BaseLayout title={`Artikel bertag #${tag}`} description={`Kumpulan artikel Cendera dengan tag #${tag}.`}>
+<!-- noindex: halaman tag berisi sedikit artikel (konten tipis); tautan tetap diikuti crawler. -->
+<BaseLayout title={`Artikel bertag #${tag}`} description={`Kumpulan artikel Cendera dengan tag #${tag}.`} noindex>
   <BlogIndex title={`#${tag}`} lead={`${posts.length} artikel dengan tag ini.`} posts={posts} allPosts={all} activeTag={tag}
     crumbs={[{ label: 'Blog', href: '/blog' }]} />
 </BaseLayout>

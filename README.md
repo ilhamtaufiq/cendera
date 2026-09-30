@@ -230,8 +230,7 @@ atau aktifkan blok `routes` di `wrangler.jsonc`:
 
 ```jsonc
 "routes": [
-  { "pattern": "cendera.id", "custom_domain": true },
-  { "pattern": "www.cendera.id", "custom_domain": true }
+  { "pattern": "cendera.cianjur.space", "custom_domain": true }
 ]
 ```
 
@@ -269,13 +268,44 @@ Jangan lupa perbarui `SITE_URL`, `ALLOWED_ORIGINS`, dan domain di widget Turnsti
 
 ---
 
+## Troubleshooting
+
+**Form menampilkan kotak "Berhasil! — Hanya untuk pengujian. Jika terlihat, laporkan ke pemilik situs".**
+Itu widget Turnstile yang memakai *kunci uji* karena `PUBLIC_TURNSTILE_SITE_KEY` belum diisi saat build.
+Buat widget di Dashboard → Turnstile (hostname: `cendera.cianjur.space`), isi *site key* di
+Workers Builds → Settings → Build → Variables and secrets, set *secret key* dengan
+`npx wrangler secret put TURNSTILE_SECRET_KEY`, lalu build ulang. Build menampilkan peringatan bila kunci belum diisi.
+Widget memakai mode `interaction-only`, jadi normalnya tidak terlihat sama sekali.
+
+**Tautan share / canonical berakhiran `.html`.** Sudah ditangani: halaman dibangun sebagai `slug.html`
+(`build.format: 'file'`, agar tidak ada redirect trailing slash), dan semua URL publik dibersihkan lewat `src/lib/url.ts`.
+
+**Pratinjau (OG image) tidak muncul saat dibagikan.** Setiap artikel & proyek otomatis mendapat JPEG 1200×630
+di `/og/{blog,proyek}/<slug>.jpg` (dibuat `scripts/og-images.mjs` saat `prebuild` dari `cover`). Bila pratinjau lama
+masih tersimpan di platform, segarkan cache-nya:
+[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/),
+[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/). WhatsApp menyimpan cache beberapa hari;
+untuk uji cepat tambahkan query, mis. `?v=2`.
+
+**Domain.** URL produksi diatur lewat `SITE_URL` (default `https://cendera.cianjur.space`) dan `ALLOWED_ORIGINS`
+di `wrangler.jsonc`. Ganti keduanya bila domain berubah.
+
+## SEO
+
+- Judul & deskripsi beranda berfokus lokal (Cianjur): `SITE.homeTitle`, `SITE.description` di `src/data/site.ts`.
+- JSON-LD `Organization` + `ProfessionalService` dengan alamat, jam buka, area layanan, dan kontak.
+- `robots` dengan `max-image-preview:large`; halaman tag `noindex, follow` dan tidak masuk sitemap (konten tipis).
+- Sitemap memuat `lastmod` dari tanggal artikel. Setelah rilis, daftarkan `https://cendera.cianjur.space/sitemap-index.xml`
+  di Google Search Console & Bing Webmaster Tools, dan buat/klaim **Google Business Profile** dengan alamat yang sama
+  persis (NAP konsisten) untuk pencarian lokal.
+
 ## Yang perlu diganti sebelum rilis
 
 Cari kata **`PLACEHOLDER`** di repo untuk menemukan semuanya.
 
 | Bagian | Lokasi |
 | --- | --- |
-| Email, WhatsApp, alamat, peta, jam kerja, sosial media | `src/data/site.ts` |
+| Email, WhatsApp, pin peta, jam kerja, sosial media (alamat sudah diisi) | `src/data/site.ts` |
 | Nama badan hukum & tahun berdiri | `src/data/site.ts` (`legalName`, `foundingYear`) |
 | Angka statistik, logo klien, testimoni | `src/data/home.id.ts` |
 | Anggota tim + foto | `src/content/tim/*.md`, `public/images/tim/` |

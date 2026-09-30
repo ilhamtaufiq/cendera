@@ -1,11 +1,15 @@
 ---
 /**
  * Wadah widget Cloudflare Turnstile. Script Turnstile dimuat malas (lazy) oleh
- * src/scripts/forms.ts saat form mendekati viewport, agar tidak membebani performa awal.
- * Site key diambil dari env build PUBLIC_TURNSTILE_SITE_KEY.
+ * src/scripts/forms.ts saat form mendekati viewport.
+ *
+ * Site key diambil dari env BUILD `PUBLIC_TURNSTILE_SITE_KEY` (Workers Builds → Variables).
+ * Bila kosong, dipakai KUNCI UJI Cloudflare yang menampilkan label
+ * "Hanya untuk pengujian" — jadi pastikan variabel ini diisi di produksi.
  */
+const TEST_KEY = '1x00000000000000000000AA';
 interface Props { action: string; class?: string }
 const { action, class: className = '' } = Astro.props;
-const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || TEST_KEY;
 ---
-<div class:list={['turnstile-slot min-h-[65px]', className]} data-turnstile data-sitekey={siteKey} data-action={action}></div>
+<div class:list={['turnstile-slot', className]} data-turnstile data-sitekey={siteKey} data-action={action}></div>

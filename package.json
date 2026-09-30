@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Situs company profile Cendera — Astro + Markdown di Git, dijalankan di Cloudflare Workers.",
+  "description": "Situs company profile Cendera \u2014 Astro + Markdown di Git, dijalankan di Cloudflare Workers.",
   "scripts": {
+    "predev": "node scripts/og-images.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/og-images.mjs",
     "build": "astro build && node scripts/postbuild.mjs",
-    "preview": "astro build && node scripts/postbuild.mjs && wrangler dev",
+    "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "check": "astro check",
     "images": "node scripts/generate-images.mjs",
@@ -25,6 +27,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
     "rehype-autolink-headings": "^7.1.0",
+    "sharp": "^0.35.5",
     "simple-icons": "^16.33.0",
     "tailwindcss": "^4.3.3",
     "unist-util-visit": "^5.1.0"
@@ -33,7 +36,6 @@
     "@astrojs/check": "^0.9.10",
     "pagefind": "^1.5.2",
     "potrace": "^2.1.8",
-    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "wrangler": "^4.144.0"
   }

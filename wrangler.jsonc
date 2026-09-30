@@ -31,10 +31,11 @@
   // Variabel non-rahasia. Secret (API key, Turnstile secret, webhook) → `wrangler secret put`.
   "vars": {
     "CONTACT_TO_EMAIL": "halo@cendera.id",
-    "CONTACT_FROM_EMAIL": "Cendera Web <noreply@cendera.id>",
+    // Alamat pengirim harus di domain yang sudah diverifikasi di Resend.
+    "CONTACT_FROM_EMAIL": "Cendera Web <noreply@cendera.cianjur.space>",
     // Daftar adapter notifikasi, dipisah koma: resend | webhook | console
     "CONTACT_NOTIFIERS": "resend",
-    "ALLOWED_ORIGINS": "https://cendera.id,https://www.cendera.id"
+    "ALLOWED_ORIGINS": "https://cendera.cianjur.space"
   },
 
   // Rate limit per IP untuk form (Workers Rate Limiting binding). period hanya boleh 10 atau 60 detik.
@@ -47,8 +48,9 @@
   "kv_namespaces": [{ "binding": "NEWSLETTER" }],
 
   // Domain kustom (Workers Custom Domains, SSL otomatis). Aktifkan setelah domain ada di akun Cloudflare.
+  // Aktifkan bila domain cianjur.space dikelola di akun Cloudflare yang sama; bila domain
+  // sudah dipasang lewat dashboard (Settings → Domains & Routes), blok ini tidak wajib.
   // "routes": [
-  //   { "pattern": "cendera.id", "custom_domain": true },
-  //   { "pattern": "www.cendera.id", "custom_domain": true }
+  //   { "pattern": "cendera.cianjur.space", "custom_domain": true }
   // ],
 }
