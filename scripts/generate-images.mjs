@@ -4,7 +4,7 @@
  *
  * Menghasilkan:
  * - Cover & galeri proyek (mockup SVG → WebP) — SEMUA DATA DUMMY, bukan data asli klien.
- * - Cover artikel blog (WebP) dengan judul artikel.
+ * (Cover artikel blog kini dibuat otomatis saat build oleh scripts/build-images.mjs.)
  * - Foto placeholder anggota tim.
  * - Gambar Open Graph default (PNG 1200×630), favicon (SVG/ICO/PNG), ikon manifest.
  *
@@ -335,43 +335,6 @@ const projects = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Cover blog (1600×900)                                               */
-/* ------------------------------------------------------------------ */
-function wrap(str, max) {
-  const words = str.split(' ');
-  const lines = [''];
-  for (const w of words) {
-    if ((lines.at(-1) + ' ' + w).trim().length > max) lines.push(w);
-    else lines[lines.length - 1] = (lines.at(-1) + ' ' + w).trim();
-  }
-  return lines;
-}
-const blogCover = (title, category, motif) => {
-  const lines = wrap(title, 26);
-  const motifs = {
-    ledger: `${rect(1000, 180, 480, 540, { r: 18, fill: '#111', stroke: '#2a2a2a' })}
-      ${['Akun', 'Kas', 'Pendapatan', 'Persediaan', 'Utang'].map((a, i) => `${text(1040, 250 + i * 80, a, { size: 22, fill: i ? '#d4d4d4' : '#8a8a8a', font: i ? SANS : MONO })}${i ? text(1440, 250 + i * 80, i % 2 ? '500 / —' : '— / 500', { size: 20, fill: G, anchor: 'end', font: MONO }) : ''}<line x1="1040" y1="${270 + i * 80}" x2="1440" y2="${270 + i * 80}" stroke="#262626" stroke-width="2"/>`).join('')}
-      ${text(1440, 690, 'Σ Debit = Σ Kredit', { size: 22, fill: G, anchor: 'end', font: MONO })}`,
-    bff: `${[['React SPA', 200], ['BFF · Hono', 400], ['Laravel', 600]].map(([t, y], i) => `${rect(1020, y, 420, 110, { r: 16, fill: i === 1 ? 'rgba(0,212,14,0.12)' : '#111', stroke: i === 1 ? G : '#2a2a2a', sw: 2 })}${text(1230, y + 66, t, { size: 30, weight: 700, fill: i === 1 ? G : '#E5E5E5', anchor: 'middle', font: FONT })}${i < 2 ? `<path d="M1230 ${y + 114} v 80" stroke="${G}" stroke-width="3" stroke-dasharray="6 6"/>` : ''}`).join('')}`,
-    git: `<g stroke="${G}" stroke-width="5" fill="none"><path d="M1100 160 V 740"/><path d="M1100 300 C 1100 380, 1300 360, 1300 440 V 560 C 1300 640, 1100 620, 1100 700"/></g>
-      ${[[1100, 180], [1100, 300], [1300, 440], [1300, 560], [1100, 700]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="20" fill="${BG}" stroke="${G}" stroke-width="5"/>${text(x + 44, y + 9, ['init', 'artikel.md', 'draft', 'review', 'deploy 🚀'.replace(' 🚀', '')][i], { size: 26, fill: '#d4d4d4', font: MONO })}`).join('')}`,
-  };
-  return canvas(1600, 900, `
-    ${logoMark(110, 110, 70)}
-    ${text(170, 160, 'CENDERA · BLOG', { size: 20, fill: '#8a8a8a', font: MONO })}
-    ${rect(110, 250, 30 + category.length * 15, 46, { r: 23, fill: 'rgba(0,212,14,0.12)', stroke: 'none' })}
-    ${text(128, 281, category.toUpperCase(), { size: 18, fill: G, font: MONO })}
-    ${lines.map((l, i) => text(110, 380 + i * 78, l, { size: 66, weight: 700, fill: '#F5F5F5', font: FONT })).join('')}
-    ${motifs[motif]}
-  `, { glow: [0.85, 0.2] });
-};
-const blogCovers = {
-  'erp-bengkel-double-entry-ledger': ['Membangun ERP untuk Bengkel: Pelajaran dari Double-Entry Ledger', 'Studi Kasus', 'ledger'],
-  'arsitektur-bff-aplikasi-pemerintah': ['Arsitektur BFF untuk Aplikasi Pemerintah', 'Teknologi', 'bff'],
-  'konten-situs-di-git': ['Mengapa Konten Situs Sebaiknya Disimpan di Git', 'Tips', 'git'],
-};
-
-/* ------------------------------------------------------------------ */
 /* Tim, OG, favicon                                                    */
 /* ------------------------------------------------------------------ */
 const avatar = (n) => canvas(600, 600, `
@@ -412,10 +375,6 @@ const skip = (f) => !force && existsSync(f) && process.argv.includes('--missing'
 for (const [name, make] of Object.entries(projects)) {
   const f = `public/images/proyek/${name}.webp`;
   if (!skip(f)) await out(f, make(), 'webp');
-}
-for (const [slug, [title, cat, motif]] of Object.entries(blogCovers)) {
-  const f = `public/images/blog/${slug}.webp`;
-  if (!skip(f)) await out(f, blogCover(title, cat, motif), 'webp');
 }
 for (const n of [1, 2, 3, 4]) await out(`public/images/tim/anggota-${n}.webp`, avatar(n), 'webp');
 await out('public/images/tim/placeholder.webp', avatar(''), 'webp');

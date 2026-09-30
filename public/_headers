@@ -23,6 +23,11 @@
   ! Cache-Control
   Cache-Control: public, max-age=3600
 
+# Cover artikel otomatis (dibuat saat build)
+/covers/*
+  ! Cache-Control
+  Cache-Control: public, max-age=86400
+
 # Gambar Open Graph (dibuat saat build)
 /og/*
   ! Cache-Control

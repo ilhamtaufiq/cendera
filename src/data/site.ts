@@ -23,7 +23,7 @@ export const SITE = {
   locale: 'id-ID',
   lang: 'id',
   foundingYear: 2021, // PLACEHOLDER
-  // Kartu OG dibuat saat build oleh scripts/og-images.mjs
+  // Kartu OG dibuat saat build oleh scripts/build-images.mjs
   ogImage: '/og/pages/home.png',
   logo: '/images/brand/cendera-logo.svg',
   themeColor: '#0A0A0A',

@@ -5,7 +5,7 @@ date: 2026-09-30
 author: "Tim Cendera"
 tags: ["astro", "cloudflare", "markdown", "git"]
 category: "Tips"
-cover: "/images/blog/konten-situs-di-git.webp"
+# image: tidak diisi → cover otomatis bermotif heksagonal
 draft: false
 featured: false
 ---

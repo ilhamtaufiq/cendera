@@ -31,6 +31,13 @@ export async function getJobs() {
   return items.sort((a, b) => Number(b.data.open) - Number(a.data.open) || b.data.date.valueOf() - a.data.date.valueOf());
 }
 
+/** Cover artikel: `cover` manual bila diisi, selain itu cover otomatis hasil build. */
+export const postCover = (p: Post) => p.data.cover ?? `/covers/blog/${p.id}.webp`;
+
+/** Teks alternatif cover artikel. */
+export const postCoverAlt = (p: Post) =>
+  p.data.coverAlt ?? p.data.imageAlt ?? `Cover artikel "${p.data.title}" — kategori ${p.data.category}`;
+
 /** Slug URL proyek: field `slug` bila ada, selain itu id (nama file). */
 export const projectSlug = (p: Project) => p.data.slug ?? p.id;
 

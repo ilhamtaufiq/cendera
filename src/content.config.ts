@@ -26,7 +26,12 @@ const blog = defineCollection({
     author: z.string().default('Tim Cendera'),
     tags: z.array(z.string().regex(/^[a-z0-9-]+$/, 'Tag huruf kecil, angka, dan tanda "-" saja')).default([]),
     category: z.enum(BLOG_CATEGORIES),
-    cover: imagePath,
+    // Foto/gambar penulis (opsional). Cover bertema Cendera (gambar + judul + kategori)
+    // dibuat OTOMATIS saat build → /covers/blog/<slug>.webp (scripts/build-images.mjs).
+    image: imagePath.optional(),
+    imageAlt: z.string().optional(),
+    // Opsional: cover jadi buatan sendiri (menonaktifkan cover otomatis untuk artikel ini).
+    cover: imagePath.optional(),
     coverAlt: z.string().optional(),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),

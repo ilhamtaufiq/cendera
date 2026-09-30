@@ -114,11 +114,17 @@ Setiap perubahan cukup di-commit & push — situs akan rebuild otomatis.
    | `author` | | default "Tim Cendera" |
    | `tags` | | huruf kecil/angka/`-`, mis. `["laravel", "govtech"]` → halaman `/blog/tag/laravel` |
    | `category` | ✓ | `Teknologi` \| `Kreatif` \| `Studi Kasus` \| `Tips` |
-   | `cover` | ✓ | path di `public/`, mis. `/images/blog/judul.webp` (16:9, ±1600×900) |
+   | `image` | | foto/gambar apa saja di `public/` (mis. `/images/blog/foto.webp`) atau URL — **cover dibuat otomatis** |
+   | `imageAlt` | | deskripsi gambar (aksesibilitas) |
+   | `cover` | | opsional: cover buatan sendiri; bila diisi, cover otomatis dilewati |
    | `draft` | | `true` = tidak ikut build produksi (tetap tampil di `npm run dev`) |
    | `featured` | | penanda artikel unggulan |
 
-3. Letakkan gambar di `public/images/blog/` (WebP/AVIF disarankan).
+3. Letakkan gambar di `public/images/blog/` (JPG/PNG/WebP, ukuran bebas — dipotong otomatis) lalu isi `image:`.
+   **Cover dibuat otomatis saat build** bertema Cendera: gambar Anda di sisi kanan (dengan gradasi gelap),
+   logo, kategori, judul, tanggal, waktu baca, dan penulis → `/covers/blog/<slug>.webp`.
+   Tanpa `image`, cover memakai motif heksagonal & logo. Build gagal dengan pesan jelas bila file gambar tidak ditemukan.
+   Tampilan cover diatur di fungsi `coverCard()` pada `scripts/build-images.mjs`.
 4. Commit & push. Bila front matter salah, build **gagal** dengan pesan yang menyebut file & field-nya.
 
 Fitur Markdown yang didukung:
@@ -283,7 +289,7 @@ Widget memakai mode `interaction-only`, jadi normalnya tidak terlihat sama sekal
 
 **Pratinjau (OG image) saat dibagikan.** Setiap artikel, proyek, dan halaman utama otomatis mendapat kartu PNG
 1200×630 bergaya kartu GitHub dengan identitas Cendera (domain/bagian, judul, deskripsi, kategori/tanggal/waktu baca
-atau tahun/status, chip tag/teknologi, logo). Dibuat oleh `scripts/og-images.mjs` saat `prebuild`/`predev` dengan
+atau tahun/status, chip tag/teknologi, logo). Dibuat oleh `scripts/build-images.mjs` saat `prebuild`/`predev` dengan
 Satori (font ikut dibawa, jadi hasil di server build sama dengan lokal) → `public/og/{blog,proyek,pages}/`.
 Ubah tampilannya di fungsi `card()` pada skrip tersebut. Bila pratinjau lama masih tersimpan di platform, segarkan cache-nya:
 [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/),

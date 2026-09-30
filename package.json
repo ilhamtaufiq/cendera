@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Situs company profile Cendera — Astro + Markdown di Git, dijalankan di Cloudflare Workers.",
   "scripts": {
-    "predev": "node scripts/og-images.mjs",
+    "predev": "node scripts/build-images.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/og-images.mjs",
+    "prebuild": "node scripts/build-images.mjs",
     "build": "astro build && node scripts/postbuild.mjs",
     "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",

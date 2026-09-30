@@ -5,7 +5,8 @@ date: 2026-09-22
 author: "Tim Cendera"
 tags: ["erp", "akuntansi", "fastapi", "studi-kasus"]
 category: "Studi Kasus"
-cover: "/images/blog/erp-bengkel-double-entry-ledger.webp"
+image: "/images/proyek/tpm-super-app-1.webp"
+imageAlt: "Mockup aplikasi TPM Super App (data dummy)"
 draft: false
 featured: true
 ---
