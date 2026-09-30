@@ -1,12 +1,12 @@
 ---
-import { formatDate, readingTime, type Post } from '@/lib/content';
+import { formatDate, postCover, readingTime, type Post } from '@/lib/content';
 interface Props { post: Post; headingLevel?: 'h2' | 'h3'; eager?: boolean }
 const { post, headingLevel: H = 'h3', eager = false } = Astro.props;
 const d = post.data;
 const href = `/blog/${post.id}`;
 ---
 <article class="card card-hover group flex h-full flex-col overflow-hidden">
-  <img src={d.cover} alt="" width="1600" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async"
+  <img src={postCover(post)} alt="" width="1600" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async"
     class="aspect-[16/9] w-full border-b border-border object-cover transition duration-500 group-hover:scale-[1.02]" />
   <div class="flex flex-1 flex-col p-6">
     <div class="flex items-center gap-3 text-xs text-fg-subtle">

@@ -6,8 +6,9 @@ date: 2026-10-01
 author: "Nama Penulis"
 tags: ["tag-satu", "tag-dua"]  # huruf kecil, angka, tanda "-"
 category: "Teknologi"          # Teknologi | Kreatif | Studi Kasus | Tips
-cover: "/images/blog/nama-file.webp"
-# coverAlt: "Deskripsi gambar cover"
+image: "/images/blog/nama-file.webp"  # foto/gambar apa saja (opsional) → cover dibuat otomatis
+imageAlt: "Deskripsi singkat gambar"
+# cover: "/images/blog/cover-jadi.webp"  # opsional: pakai cover buatan sendiri (menonaktifkan cover otomatis)
 draft: true                    # ubah ke false saat siap terbit
 featured: false
 ---

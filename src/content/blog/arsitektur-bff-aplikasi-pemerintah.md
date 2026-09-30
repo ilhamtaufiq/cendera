@@ -5,7 +5,8 @@ date: 2026-09-10
 author: "Tim Cendera"
 tags: ["arsitektur", "govtech", "hono", "laravel"]
 category: "Teknologi"
-cover: "/images/blog/arsitektur-bff-aplikasi-pemerintah.webp"
+image: "/images/proyek/arumanis.webp"
+imageAlt: "Mockup dashboard ARUMANIS (data dummy)"
 draft: false
 featured: false
 ---

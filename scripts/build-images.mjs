@@ -1,8 +1,12 @@
 /**
- * Gambar Open Graph bergaya "kartu GitHub" dengan identitas Cendera (PNG 1200×630).
- * Dijalankan otomatis sebelum build/dev (`prebuild`, `predev`).
+ * Gambar otomatis bertema Cendera, dibuat sebelum build/dev (`prebuild`, `predev`):
  *
- * Output (di-.gitignore, selalu dibuat ulang):
+ * 1. COVER ARTIKEL (WebP 1600×900) — public/covers/blog/<slug>.webp
+ *    Disusun dari front matter: `image` (foto/gambar penulis, opsional), judul, kategori,
+ *    tanggal, waktu baca, dan logo. Penulis cukup mengisi `image:`; tidak perlu desain manual.
+ *    Dilewati bila artikel mengisi `cover:` sendiri (override manual).
+ *
+ * 2. KARTU OPEN GRAPH bergaya kartu GitHub (PNG 1200×630):
  *   public/og/blog/<slug>.png     — per artikel
  *   public/og/proyek/<slug>.png   — per proyek
  *   public/og/pages/<nama>.png    — beranda, blog, proyek, karier
@@ -11,7 +15,7 @@
  * lalu dikonversi ke PNG dengan sharp. Jadi hasilnya sama persis di laptop maupun
  * di server Workers Builds yang tidak punya font terpasang.
  */
-import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
+import { readdir, readFile, mkdir, writeFile, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import satori from 'satori';
 import sharp from 'sharp';
@@ -126,7 +130,81 @@ async function entries(dir) {
   return out;
 }
 
+/* ------------------------------------------------------------------ */
+/* Cover artikel otomatis (1600×900)                                   */
+/* ------------------------------------------------------------------ */
+const CW = 1600, CH = 900;
+const coverPatternUri = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}"><g fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1.5">${
+  (() => { let s = ''; for (let y = -1; y < CH / hh + 1; y++) for (let x = -1; x < CW / hw + 1; x++) s += `<polygon points="${hex(x * hw + hw / 2, y * hh + r)}"/><polygon points="${hex(x * hw, y * hh + r * 2.5)}"/>`; return s; })()
+}</g></svg>`);
+
+/** Muat gambar penulis (path di public/ atau URL) → data URI JPEG yang sudah diperkecil. */
+async function loadImage(src, where) {
+  let buf;
+  if (/^https?:\/\//.test(src)) {
+    const res = await fetch(src);
+    if (!res.ok) throw new Error(`[${where}] gagal mengunduh image "${src}" (${res.status})`);
+    buf = Buffer.from(await res.arrayBuffer());
+  } else {
+    const file = join('public', src);
+    try { await access(file); } catch { throw new Error(`[${where}] image tidak ditemukan: ${file} — taruh gambarnya di folder public/ (mis. public/images/blog/).`); }
+    buf = await readFile(file);
+  }
+  const jpg = await sharp(buf).rotate().resize(1100, 900, { fit: 'cover', position: 'attention' }).jpeg({ quality: 86 }).toBuffer();
+  return `data:image/jpeg;base64,${jpg.toString('base64')}`;
+}
+
+function coverCard({ title, category, date, minutes, author, photo }) {
+  const len = title.length;
+  const size = photo ? (len > 60 ? 62 : len > 38 ? 72 : 84) : (len > 70 ? 70 : len > 40 ? 82 : 96);
+  const textWidth = photo ? 860 : 1180;
+  return h('div', { width: CW, height: CH, display: 'flex', position: 'relative', background: '#0A0A0A', fontFamily: 'Inter', color: '#F5F5F5' }, [
+    img(coverPatternUri, { position: 'absolute', left: 0, top: 0, width: CW, height: CH }),
+    photo
+      ? img(photo, { position: 'absolute', right: 0, top: 0, width: 1100, height: CH, objectFit: 'cover' })
+      : img(logoOutlineUri, { position: 'absolute', right: -80, top: -60, height: 1020, width: (1020 * LW) / LH }),
+    // Gradasi agar teks selalu terbaca di atas foto apa pun
+    photo
+      ? h('div', { position: 'absolute', left: 0, top: 0, width: CW, height: CH, background: 'linear-gradient(90deg, #0A0A0A 0%, #0A0A0A 34%, rgba(10,10,10,0.82) 50%, rgba(10,10,10,0.25) 78%, rgba(10,10,10,0.05) 100%)' })
+      : h('div', { position: 'absolute', right: -200, top: -220, width: 900, height: 900, borderRadius: 9999, background: 'radial-gradient(circle, rgba(0,212,14,0.24) 0%, rgba(0,212,14,0) 65%)' }),
+    h('div', { position: 'absolute', left: 0, bottom: 0, width: CW, height: 260, background: 'linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.85) 100%)' }),
+
+    h('div', { display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '90px 110px 0 110px' }, [
+      h('div', { display: 'flex', alignItems: 'center' }, [
+        img(logoUri, { height: 64, width: (64 * LW) / LH, marginRight: 22 }),
+        h('span', { fontFamily: 'JetBrains Mono', fontSize: 26, letterSpacing: 4, color: '#a3a3a3' }, 'CENDERA · BLOG'),
+      ]),
+      h('div', { display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center', width: textWidth }, [
+        h('div', { display: 'flex' }, [
+          h('div', { display: 'flex', padding: '10px 22px', borderRadius: 999, background: 'rgba(0,212,14,0.14)', border: '1.5px solid rgba(0,212,14,0.45)', color: GREEN, fontFamily: 'JetBrains Mono', fontSize: 24, letterSpacing: 2 }, category.toUpperCase()),
+        ]),
+        h('div', { marginTop: 34, fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: size, lineHeight: 1.08, letterSpacing: -2 }, clip(title, 110)),
+      ]),
+      h('div', { display: 'flex', alignItems: 'center', paddingBottom: 80, fontSize: 28, color: '#c4c4c4' },
+        [date, `${minutes} menit baca`, author].filter(Boolean).flatMap((m, i) => [
+          i ? h('div', { width: 7, height: 7, borderRadius: 9999, background: GREEN, margin: '0 22px' }) : null,
+          h('span', {}, m),
+        ]).filter(Boolean)),
+    ]),
+    h('div', { position: 'absolute', left: 0, bottom: 0, width: CW, height: 12, display: 'flex' }, [
+      h('div', { width: '62%', height: '100%', background: GREEN }),
+      h('div', { width: '26%', height: '100%', background: '#067A10' }),
+      h('div', { width: '12%', height: '100%', background: '#3a3a3a' }),
+    ]),
+  ]);
+}
+
 let n = 0;
+const fmtLong = (d) => new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(d));
+for (const { id, data: d, body } of await entries('src/content/blog')) {
+  if (d.cover) continue; // cover manual → tidak dibuat otomatis
+  const photo = d.image ? await loadImage(d.image, `blog/${id}`) : null;
+  const svg = await satori(coverCard({ title: d.title, category: d.category, date: fmtLong(d.date), minutes: readTime(body), author: d.author, photo }), { width: CW, height: CH, fonts });
+  await mkdir('public/covers/blog', { recursive: true });
+  await writeFile(`public/covers/blog/${id}.webp`, await sharp(Buffer.from(svg)).webp({ quality: 86 }).toBuffer());
+  n++;
+}
+
 for (const { id, data: d, body } of await entries('src/content/blog')) {
   await render(`public/og/blog/${id}.png`, {
     section: 'blog', title: d.title, description: d.description,
@@ -148,4 +226,4 @@ const pages = {
   karier: { section: 'karier', title: 'Tumbuh bersama Cendera', description: 'Lowongan engineer, desainer, dan kreator konten.', meta: ['Karier'], chips: [] },
 };
 for (const [name, o] of Object.entries(pages)) { await render(`public/og/pages/${name}.png`, o); n++; }
-console.log(`✓ ${n} gambar OG dibuat di public/og/`);
+console.log(`✓ ${n} gambar dibuat (cover di public/covers/, kartu OG di public/og/)`);

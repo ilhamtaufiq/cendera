@@ -7,7 +7,7 @@ import Toc from '@/components/Toc.astro';
 import ShareButtons from '@/components/ShareButtons.astro';
 import Icon from '@/components/ui/Icon.astro';
 import '@/styles/prose.css';
-import { getPosts, formatDate, readingTime, relatedPosts, slugify, type Post } from '@/lib/content';
+import { getPosts, formatDate, postCover, postCoverAlt, readingTime, relatedPosts, slugify, type Post } from '@/lib/content';
 import { SITE } from '@/data/site';
 import { absoluteUrl } from '@/lib/url';
 
@@ -33,7 +33,7 @@ const articleLd = {
   '@type': 'BlogPosting',
   headline: d.title,
   description: d.description,
-  image: new URL(d.cover, Astro.site).href,
+  image: new URL(postCover(post), Astro.site).href,
   datePublished: d.date.toISOString(),
   dateModified: (d.updated ?? d.date).toISOString(),
   author: { '@type': 'Person', name: d.author },
@@ -80,7 +80,7 @@ const breadcrumbLd = {
 
     <div class="container-site">
       <figure class="mx-auto max-w-5xl pt-10">
-        <img src={d.cover} alt={d.coverAlt ?? ''} width="1600" height="900" fetchpriority="high" class="w-full rounded-2xl border border-border" />
+        <img src={postCover(post)} alt={postCoverAlt(post)} width="1600" height="900" fetchpriority="high" class="w-full rounded-2xl border border-border" />
       </figure>
       <div class="mx-auto grid max-w-5xl gap-12 py-12 lg:grid-cols-[1fr_15rem]">
         <div class="min-w-0">

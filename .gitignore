@@ -19,5 +19,6 @@ npm-debug.log*
 .DS_Store
 *.log
 
-# gambar OG hasil build (scripts/og-images.mjs, kartu gaya GitHub)
+# gambar hasil build (scripts/build-images.mjs): kartu OG & cover artikel otomatis
 public/og/
+public/covers/
