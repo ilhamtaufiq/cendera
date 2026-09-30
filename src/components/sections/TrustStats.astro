@@ -1,0 +1,31 @@
+---
+import { stats, clients } from '@/data/home.id';
+---
+<section aria-label="Klien dan pencapaian" class="border-y border-border bg-bg-elevated">
+  <div class="container-site py-12">
+    <p class="text-center font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Dipercaya oleh instansi & bisnis</p>
+    <!-- PLACEHOLDER logo klien: ganti teks dengan <img src="/images/klien/nama.svg" alt="Nama Klien"> -->
+    <ul class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {clients.map((c) => (
+        <li class="flex h-14 items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm font-semibold text-fg-subtle grayscale transition hover:text-fg">
+          <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true"><path d="M12 2 20.7 7v10L12 22 3.3 17V7z" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+          {c}
+        </li>
+      ))}
+    </ul>
+    <dl class="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
+      {stats.map((s, i) => (
+        <div class="stat relative flex flex-col-reverse pl-5" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <dt class="mt-1 text-sm text-fg-muted">{s.label}</dt>
+          <dd class="font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            <span data-countup={s.value}>{s.value}</span><span class="text-accent-ink">{s.suffix}</span>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+<style>
+  /* Garis aksen vertikal (pseudo-element, agar <dl> hanya berisi dt/dd) */
+  .stat::before { content: ''; position: absolute; left: 0; top: 0.25rem; bottom: 0.25rem; width: 1px; background: linear-gradient(var(--accent), transparent); }
+</style>

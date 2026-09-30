@@ -1,0 +1,25 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import { tech } from '@/data/home.id';
+---
+<section id="teknologi" class="section relative overflow-hidden border-y border-border bg-bg-elevated" aria-labelledby="teknologi-title">
+  <div class="hex-pattern hex-mask absolute inset-0 opacity-20" aria-hidden="true"></div>
+  <div class="container-site relative">
+    <SectionHeading id="teknologi-title" align="center" eyebrow="Teknologi" title="Stack yang kami pakai setiap hari."
+      lead="Pilihan teknologi yang matang, populer, dan mudah dilanjutkan tim lain — bukan eksperimen di proyek Anda." />
+    <ul class="mx-auto mt-14 flex max-w-5xl flex-wrap justify-center gap-3">
+      {tech.map((t, i) => (
+        <li data-reveal style={`--reveal-delay:${(i % 8) * 40}ms`}>
+          <span class="tech-chip group inline-flex items-center gap-2.5 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-fg-muted transition">
+            <BrandIcon slug={t.icon} name={t.name} class="size-[18px] text-fg-subtle transition group-hover:text-accent-ink" />
+            {t.name}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  .tech-chip:hover { border-color: var(--accent); color: var(--fg); transform: translateY(-2px); }
+</style>

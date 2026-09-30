@@ -1,0 +1,42 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+interface Props { title: string; url: string }
+const { title, url } = Astro.props;
+const e = encodeURIComponent;
+const links = [
+  { name: 'WhatsApp', slug: 'whatsapp', href: `https://wa.me/?text=${e(`${title} — ${url}`)}` },
+  { name: 'X', slug: 'x', href: `https://x.com/intent/post?text=${e(title)}&url=${e(url)}` },
+  { name: 'LinkedIn', slug: 'linkedin', href: `https://www.linkedin.com/sharing/share-offsite/?url=${e(url)}` },
+  { name: 'Facebook', slug: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
+];
+---
+<div class="flex flex-wrap items-center gap-2" data-share data-title={title} data-url={url}>
+  <span class="mr-1 font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Bagikan</span>
+  {links.map((l) => (
+    <a href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`Bagikan ke ${l.name}`}
+      class="inline-flex size-9 items-center justify-center rounded-lg border border-border text-fg-muted transition hover:border-accent hover:text-accent-ink">
+      <BrandIcon slug={l.slug} class="size-4" />
+    </a>
+  ))}
+  <button type="button" data-copy-link aria-label="Salin tautan"
+    class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border px-3 text-sm text-fg-muted transition hover:border-accent hover:text-accent-ink">
+    <Icon name="link" class="size-4" /><span data-copy-label>Salin tautan</span>
+  </button>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-share]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-copy-link]')!;
+    const label = root.querySelector<HTMLElement>('[data-copy-label]')!;
+    btn.addEventListener('click', async () => {
+      const { title, url } = root.dataset;
+      // Di perangkat mobile, pakai Web Share API bila ada.
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        try { await navigator.share({ title, url }); return; } catch { /* dibatalkan */ }
+      }
+      try { await navigator.clipboard.writeText(url!); label.textContent = 'Tersalin ✓'; }
+      catch { label.textContent = 'Gagal menyalin'; }
+      setTimeout(() => (label.textContent = 'Salin tautan'), 1800);
+    });
+  });
+</script>

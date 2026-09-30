@@ -1,0 +1,128 @@
+---
+export const prerender = true;
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostCard from '@/components/PostCard.astro';
+import Toc from '@/components/Toc.astro';
+import ShareButtons from '@/components/ShareButtons.astro';
+import Icon from '@/components/ui/Icon.astro';
+import '@/styles/prose.css';
+import { getPosts, formatDate, readingTime, relatedPosts, slugify, type Post } from '@/lib/content';
+import { SITE } from '@/data/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // posts terurut terbaru → "berikutnya" (lebih baru) = index sebelumnya
+    props: { post, posts, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+interface Props { post: Post; posts: Post[]; newer?: Post; older?: Post }
+const { post, posts, newer, older } = Astro.props;
+const d = post.data;
+const { Content, headings } = await render(post);
+const minutes = readingTime(post.body);
+const related = relatedPosts(post, posts);
+const url = new URL(Astro.url.pathname, Astro.site).href;
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: d.title,
+  description: d.description,
+  image: new URL(d.cover, Astro.site).href,
+  datePublished: d.date.toISOString(),
+  dateModified: (d.updated ?? d.date).toISOString(),
+  author: { '@type': 'Person', name: d.author },
+  publisher: { '@id': new URL('/#organization', Astro.site).href },
+  mainEntityOfPage: url,
+  keywords: d.tags.join(', '),
+  articleSection: d.category,
+  inLanguage: 'id-ID',
+  timeRequired: `PT${minutes}M`,
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Beranda', item: new URL('/', Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/blog', Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: d.title },
+  ],
+};
+---
+<BaseLayout title={d.title} description={d.description} image={d.cover} imageAlt={d.coverAlt ?? d.title} type="article"
+  publishedTime={d.date} modifiedTime={d.updated} author={d.author} tags={d.tags} jsonLd={[articleLd, breadcrumbLd]}>
+  <article data-pagefind-body data-pagefind-filter="tipe:blog">
+    <header class="relative isolate overflow-hidden border-b border-border">
+      <div class="hex-pattern hex-mask absolute inset-0 -z-10 opacity-20" aria-hidden="true"></div>
+      <div class="container-site max-w-4xl py-14 lg:py-20">
+        <nav aria-label="Breadcrumb" class="font-mono text-xs text-fg-subtle" data-pagefind-ignore>
+          <ol class="flex flex-wrap gap-2">
+            <li><a href="/" class="hover:text-fg">Beranda</a> /</li>
+            <li><a href="/blog" class="hover:text-fg">Blog</a> /</li>
+            <li><a href={`/blog/kategori/${slugify(d.category)}`} class="hover:text-fg">{d.category}</a></li>
+          </ol>
+        </nav>
+        <h1 class="mt-6 font-display text-4xl font-bold leading-tight sm:text-5xl" data-pagefind-meta="title">{d.title}</h1>
+        <p class="mt-5 text-lg leading-relaxed text-fg-muted">{d.description}</p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-fg-muted" data-pagefind-ignore>
+          <span class="inline-flex items-center gap-2"><Icon name="user" class="size-4" />{d.author}</span>
+          <span class="inline-flex items-center gap-2"><Icon name="calendar" class="size-4" /><time datetime={d.date.toISOString()}>{formatDate(d.date)}</time></span>
+          {d.updated && <span>Diperbarui <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time></span>}
+          <span class="inline-flex items-center gap-2"><Icon name="clock" class="size-4" />{minutes} menit baca</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-site">
+      <figure class="mx-auto max-w-5xl pt-10">
+        <img src={d.cover} alt={d.coverAlt ?? ''} width="1600" height="900" fetchpriority="high" class="w-full rounded-2xl border border-border" />
+      </figure>
+      <div class="mx-auto grid max-w-5xl gap-12 py-12 lg:grid-cols-[1fr_15rem]">
+        <div class="min-w-0">
+          <div class="prose-cendera">
+            <Content />
+          </div>
+          <footer class="mt-12 space-y-6 border-t border-border pt-8" data-pagefind-ignore>
+            <ul class="flex flex-wrap gap-2" aria-label="Tag">
+              {d.tags.map((t) => <li><a href={`/blog/tag/${t}`} class="chip">#{t}</a></li>)}
+            </ul>
+            <ShareButtons title={`${d.title} — ${SITE.name}`} url={url} />
+          </footer>
+
+          <nav aria-label="Artikel lain" class="mt-10 grid gap-4 sm:grid-cols-2" data-pagefind-ignore>
+            {older ? (
+              <a href={`/blog/${older.id}`} class="card card-hover p-5" rel="prev">
+                <span class="inline-flex items-center gap-1 font-mono text-xs text-fg-subtle"><Icon name="arrow-left" class="size-3.5" /> Sebelumnya</span>
+                <span class="mt-2 block font-display font-semibold">{older.data.title}</span>
+              </a>
+            ) : <span></span>}
+            {newer && (
+              <a href={`/blog/${newer.id}`} class="card card-hover p-5 text-right" rel="next">
+                <span class="inline-flex items-center gap-1 font-mono text-xs text-fg-subtle">Berikutnya <Icon name="arrow-right" class="size-3.5" /></span>
+                <span class="mt-2 block font-display font-semibold">{newer.data.title}</span>
+              </a>
+            )}
+          </nav>
+        </div>
+        <aside class="lg:sticky lg:top-24 lg:self-start" data-pagefind-ignore>
+          <Toc headings={headings} />
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="border-t border-border bg-bg-elevated py-16" aria-labelledby="terkait">
+      <div class="container-site">
+        <h2 id="terkait" class="font-display text-2xl font-semibold">Artikel terkait</h2>
+        <ul class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {related.map((p) => <li><PostCard post={p} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>

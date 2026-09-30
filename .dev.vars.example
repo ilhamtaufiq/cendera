@@ -1,0 +1,17 @@
+# Salin menjadi .dev.vars untuk pengembangan lokal (`npm run preview` / `wrangler dev`).
+# JANGAN commit .dev.vars. Di produksi, set lewat: npx wrangler secret put <NAMA>
+
+# Cloudflare Turnstile — kunci uji di bawah ini SELALU lolos (khusus lokal).
+# Produksi: buat widget di dashboard Cloudflare → Turnstile.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# Resend (https://resend.com) — API key untuk mengirim email dari form kontak.
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx
+
+# Opsional: webhook (n8n, Make, gateway WhatsApp seperti Fonnte/Wablas, Slack, dsb.)
+CONTACT_WEBHOOK_URL=
+CONTACT_WEBHOOK_TOKEN=
+
+# Timpa variabel non-rahasia di wrangler.jsonc saat lokal
+CONTACT_NOTIFIERS=console
+ALLOWED_ORIGINS=http://localhost:4321,http://localhost:8787

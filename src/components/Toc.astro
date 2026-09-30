@@ -1,0 +1,40 @@
+---
+/** Daftar isi otomatis dari heading h2/h3 Markdown. Menyorot bagian aktif saat scroll. */
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[]; title?: string }
+const { headings, title = 'Daftar isi' } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+{items.length > 1 && (
+  <nav class="toc" aria-label={title}>
+    <p class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">{title}</p>
+    <ol class="mt-4 space-y-1 border-l border-border text-sm">
+      {items.map((h) => (
+        <li>
+          <a href={`#${h.slug}`} data-toc-link={h.slug}
+            class:list={['toc-link -ml-px block border-l border-transparent py-1 text-fg-muted transition hover:text-fg', h.depth === 3 ? 'pl-7' : 'pl-4']}>
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  if (links.length) {
+    const map = new Map(links.map((l) => [l.dataset.tocLink!, l]));
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          map.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }
+      }
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    map.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  }
+</script>
+<style>
+  .toc-link[aria-current] { color: var(--accent-ink); border-left-color: var(--accent); }
+</style>

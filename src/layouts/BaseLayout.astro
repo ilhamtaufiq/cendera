@@ -1,0 +1,47 @@
+---
+import '@/styles/global.css';
+import BaseHead, { type SeoProps } from '@/components/BaseHead.astro';
+import LogoSymbol from '@/components/LogoSymbol.astro';
+import Navbar from '@/components/Navbar.astro';
+import Footer from '@/components/Footer.astro';
+import WhatsAppFab from '@/components/WhatsAppFab.astro';
+import { useTranslations } from '@/i18n/ui';
+
+type Props = SeoProps & { lang?: 'id' };
+const { lang = 'id', ...seo } = Astro.props;
+const t = useTranslations(lang);
+---
+<!doctype html>
+<html lang={lang} data-theme="dark">
+  <head>
+    <BaseHead {...seo} />
+    <!--
+      Tema: dijalankan sebelum render agar tidak berkedip (FOUC).
+      Default gelap; pilihan pengguna disimpan di localStorage.
+      Hash script ini otomatis dimasukkan ke CSP oleh scripts/postbuild.mjs.
+    -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') d.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh flex flex-col">
+    <LogoSymbol />
+    <a href="#konten" class="sr-only-focusable fixed left-4 top-4 z-[100] btn btn-primary">{t('nav.skip')}</a>
+    <Navbar />
+    <main id="konten" class="flex-1" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppFab />
+    <script>
+      import '@/scripts/interactions';
+    </script>
+  </body>
+</html>

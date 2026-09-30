@@ -1,0 +1,71 @@
+---
+import Logo from '@/components/Logo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import { NAV, SITE } from '@/data/site';
+import { useTranslations } from '@/i18n/ui';
+
+const t = useTranslations();
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => !href.includes('#') && (path === href || path.startsWith(href + '/'));
+---
+<header data-header class="site-header sticky top-0 z-50 border-b border-transparent transition-colors">
+  <nav class="container-site flex h-16 items-center justify-between gap-4 lg:h-[4.5rem]" aria-label="Navigasi utama">
+    <a href="/" class="rounded-lg" aria-label={`${SITE.name} — Beranda`}>
+      <Logo variant="lockup" height={38} />
+    </a>
+
+    <ul class="hidden items-center gap-1 lg:flex">
+      {NAV.map((item) => (
+        <li>
+          <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}
+            class="nav-link rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition hover:text-fg">
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-2">
+      <ThemeToggle />
+      <a href="/#kontak" class="btn btn-primary hidden !min-h-10 !py-2 text-sm sm:inline-flex">
+        {t('nav.cta')}
+      </a>
+      <button type="button" data-menu-toggle aria-controls="mobile-menu" aria-expanded="false" aria-label={t('nav.menu')}
+        class="inline-flex size-10 items-center justify-center rounded-xl border border-border text-fg lg:hidden">
+        <span class="menu-open-icon"><Icon name="menu" class="size-5" /></span>
+        <span class="menu-close-icon"><Icon name="x" class="size-5" /></span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" hidden class="lg:hidden border-t border-border bg-bg/95 backdrop-blur-xl">
+    <ul class="container-site flex flex-col py-4">
+      {NAV.map((item) => (
+        <li>
+          <a href={item.href} class="flex items-center justify-between border-b border-border py-4 font-display text-xl font-medium text-fg">
+            {item.label}
+            <Icon name="arrow-up-right" class="size-5 text-fg-subtle" />
+          </a>
+        </li>
+      ))}
+      <li class="pt-6">
+        <a href="/#kontak" class="btn btn-primary w-full">{t('nav.cta')}</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+  }
+  .site-header[data-scrolled] { border-bottom-color: var(--border); }
+  .nav-link[aria-current='page'] { color: var(--fg); background: var(--surface-2); }
+  .menu-close-icon { display: none; }
+  [aria-expanded='true'] .menu-close-icon { display: block; }
+  [aria-expanded='true'] .menu-open-icon { display: none; }
+  #mobile-menu:not([hidden]) { height: calc(100dvh - 4rem); overflow-y: auto; }
+</style>

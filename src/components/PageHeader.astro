@@ -1,0 +1,38 @@
+---
+/** Header halaman dalam (H1 tunggal per halaman) dengan breadcrumb. */
+interface Crumb { label: string; href?: string }
+interface Props { eyebrow?: string; title: string; lead?: string; crumbs?: Crumb[] }
+const { eyebrow, title, lead, crumbs = [] } = Astro.props;
+const all = [{ label: 'Beranda', href: '/' }, ...crumbs];
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [...all, { label: title }].map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...('href' in c && c.href ? { item: new URL(c.href, Astro.site).href } : {}),
+  })),
+};
+---
+<section class="relative isolate overflow-hidden border-b border-border">
+  <div class="hex-pattern hex-mask animate-drift absolute inset-0 -z-10 opacity-20" aria-hidden="true"></div>
+  <div class="absolute -top-40 right-0 -z-10 size-[30rem] rounded-full bg-[radial-gradient(circle,var(--accent-glow),transparent_65%)] opacity-50 blur-2xl" aria-hidden="true"></div>
+  <div class="container-site py-14 lg:py-20">
+    <nav aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-2 font-mono text-xs text-fg-subtle">
+        {all.map((c) => (
+          <li class="flex items-center gap-2">
+            <a href={c.href} class="hover:text-fg">{c.label}</a><span aria-hidden="true">/</span>
+          </li>
+        ))}
+        <li aria-current="page" class="text-fg-muted line-clamp-1">{title}</li>
+      </ol>
+    </nav>
+    {eyebrow && <p class="eyebrow mt-8">{eyebrow}</p>}
+    <h1 class="mt-4 max-w-4xl font-display text-4xl font-bold leading-tight sm:text-5xl">{title}</h1>
+    {lead && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-fg-muted">{lead}</p>}
+    <slot />
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+</section>

@@ -1,0 +1,14 @@
+---
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import { whatsappLink } from '@/data/site';
+---
+<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" aria-label="Chat WhatsApp dengan Cendera"
+  class="wa-fab fixed bottom-5 right-5 z-40 inline-flex size-14 items-center justify-center rounded-full bg-[#25D366] text-[#0A0A0A] shadow-lg transition hover:scale-105 focus-visible:scale-105">
+  <BrandIcon slug="whatsapp" class="size-7" />
+  <span class="wa-tip pointer-events-none absolute right-16 hidden whitespace-nowrap rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg shadow-md md:block">Chat via WhatsApp</span>
+</a>
+<style>
+  .wa-fab { box-shadow: 0 10px 30px -8px rgb(37 211 102 / 0.55); }
+  .wa-tip { opacity: 0; transform: translateX(6px); transition: opacity 0.2s, transform 0.2s; }
+  .wa-fab:hover .wa-tip, .wa-fab:focus-visible .wa-tip { opacity: 1; transform: none; }
+</style>

@@ -1,0 +1,37 @@
+---
+export const prerender = true;
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import '@/styles/prose.css';
+import { getJobs, formatDate } from '@/lib/content';
+import { CONTACT, SITE } from '@/data/site';
+
+export async function getStaticPaths() {
+  return (await getJobs()).map((job) => ({ params: { slug: job.id }, props: { job } }));
+}
+const { job } = Astro.props;
+const { Content } = await render(job);
+const d = job.data;
+const jobLd = {
+  '@context': 'https://schema.org',
+  '@type': 'JobPosting',
+  title: d.title,
+  description: d.summary,
+  datePosted: d.date.toISOString().slice(0, 10),
+  employmentType: { 'Penuh Waktu': 'FULL_TIME', 'Paruh Waktu': 'PART_TIME', Kontrak: 'CONTRACTOR', Magang: 'INTERN', Freelance: 'CONTRACTOR' }[d.type],
+  hiringOrganization: { '@type': 'Organization', name: SITE.name, sameAs: Astro.site?.href },
+  jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: CONTACT.address.city, addressRegion: CONTACT.address.region, addressCountry: 'ID' } },
+};
+const mail = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`Lamaran: ${d.title}`)}`;
+---
+<BaseLayout title={`Karier: ${d.title}`} description={d.summary} jsonLd={d.open ? jobLd : undefined}>
+  <PageHeader eyebrow={`${d.type} · ${d.location}`} title={d.title} lead={d.summary} crumbs={[{ label: 'Karier', href: '/karier' }]}>
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      {d.open ? <a href={mail} class="btn btn-primary">Kirim lamaran <Icon name="send" class="size-4" /></a> : <span class="chip">Lowongan ditutup</span>}
+      <span class="text-sm text-fg-subtle">Dipublikasikan {formatDate(d.date)}</span>
+    </div>
+  </PageHeader>
+  <div class="container-site py-12"><div class="prose-cendera"><Content /></div></div>
+</BaseLayout>

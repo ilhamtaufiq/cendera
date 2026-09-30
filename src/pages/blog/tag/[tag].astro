@@ -1,0 +1,17 @@
+---
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogIndex from '@/components/BlogIndex.astro';
+import { getPosts, collectTags } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const all = await getPosts();
+  return collectTags(all).map(([tag]) => ({ params: { tag }, props: { all, posts: all.filter((p) => p.data.tags.includes(tag)) } }));
+}
+const { all, posts } = Astro.props;
+const { tag } = Astro.params;
+---
+<BaseLayout title={`Artikel bertag #${tag}`} description={`Kumpulan artikel Cendera dengan tag #${tag}.`}>
+  <BlogIndex title={`#${tag}`} lead={`${posts.length} artikel dengan tag ini.`} posts={posts} allPosts={all} activeTag={tag}
+    crumbs={[{ label: 'Blog', href: '/blog' }]} />
+</BaseLayout>

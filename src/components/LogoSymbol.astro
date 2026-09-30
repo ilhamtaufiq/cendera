@@ -1,0 +1,12 @@
+---
+/**
+ * Mendefinisikan logo Cendera satu kali sebagai <symbol> (dipasang di BaseLayout).
+ * Path hasil vektorisasi persis dari logo resmi (scripts/trace-logo.mjs) — jangan diedit manual.
+ */
+import logo from '@/assets/brand/logo-path.json';
+---
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="cendera-logo" viewBox={logo.viewBox}>
+    <path fill-rule="evenodd" d={logo.d} />
+  </symbol>
+</svg>

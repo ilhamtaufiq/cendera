@@ -1,0 +1,104 @@
+---
+/**
+ * Mockup dashboard + ponsel (CSS/SVG murni) untuk hero. Semua angka adalah DATA DUMMY.
+ */
+import Icon from '@/components/ui/Icon.astro';
+const bars = [38, 52, 44, 68, 58, 82, 74, 90, 66, 78, 88, 96];
+const rows = [
+  { name: 'Paket A — Jaringan Air', pct: 82, state: 'Berjalan' },
+  { name: 'Paket B — Sanitasi', pct: 64, state: 'Berjalan' },
+  { name: 'Paket C — Hidran Umum', pct: 100, state: 'Selesai' },
+];
+---
+<div class="mockup relative mx-auto w-full max-w-[560px]" aria-hidden="true">
+  <!-- Jendela browser / dashboard -->
+  <div class="mock-window card overflow-hidden !rounded-2xl">
+    <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+      <span class="size-2.5 rounded-full bg-[#ff5f57]"></span>
+      <span class="size-2.5 rounded-full bg-[#febc2e]"></span>
+      <span class="size-2.5 rounded-full bg-[#28c840]"></span>
+      <div class="ml-3 flex-1 truncate rounded-md bg-surface-2 px-3 py-1 font-mono text-[10px] text-fg-subtle">app.contoh.id/dashboard</div>
+    </div>
+    <div class="grid grid-cols-[44px_1fr]">
+      <div class="flex flex-col items-center gap-3 border-r border-border py-4 text-fg-subtle">
+        <svg viewBox="0 0 598 994" class="h-6 text-brand" fill="currentColor"><use href="#cendera-logo" /></svg>
+        <Icon name="layout-dashboard" class="size-4 text-accent-ink" />
+        <Icon name="map" class="size-4" />
+        <Icon name="camera" class="size-4" />
+        <Icon name="file-text" class="size-4" />
+      </div>
+      <div class="space-y-3 p-4">
+        <div class="grid grid-cols-3 gap-2">
+          {[['Paket', '128'], ['Progres', '76%'], ['Foto', '4.2K']].map(([k, v]) => (
+            <div class="rounded-lg border border-border bg-surface-2 p-2.5">
+              <p class="text-[9px] uppercase tracking-wider text-fg-subtle">{k}</p>
+              <p class="font-display text-base font-bold text-fg">{v}</p>
+            </div>
+          ))}
+        </div>
+        <div class="rounded-lg border border-border bg-surface-2 p-3">
+          <div class="mb-2 flex items-center justify-between">
+            <p class="text-[10px] font-medium text-fg-muted">Realisasi bulanan</p>
+            <span class="rounded bg-accent-soft px-1.5 py-0.5 font-mono text-[9px] text-accent-ink">+12,4%</span>
+          </div>
+          <div class="flex h-20 items-end gap-1.5">
+            {bars.map((h, i) => (
+              <span class="bar flex-1 rounded-t-sm" style={`height:${h}%; --i:${i}`}></span>
+            ))}
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          {rows.map((r) => (
+            <div class="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5">
+              <span class="flex-1 truncate text-[10px] text-fg-muted">{r.name}</span>
+              <span class="h-1 w-16 overflow-hidden rounded-full bg-surface-2"><span class="block h-full rounded-full bg-accent" style={`width:${r.pct}%`}></span></span>
+              <span class="w-10 text-right font-mono text-[9px] text-fg-subtle">{r.pct}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ponsel -->
+  <div class="mock-phone absolute -bottom-10 -left-4 w-[36%] min-w-[150px] rounded-[1.6rem] border border-border-strong bg-bg p-1.5 shadow-2xl sm:-left-10">
+    <div class="overflow-hidden rounded-[1.25rem] border border-border bg-surface">
+      <div class="flex justify-center py-1.5"><span class="h-1 w-10 rounded-full bg-border-strong"></span></div>
+      <div class="space-y-2 px-2.5 pb-3">
+        <p class="text-[9px] text-fg-subtle">Jurnal hari ini</p>
+        <div class="map-dummy relative h-20 overflow-hidden rounded-lg border border-border">
+          <span class="pin" style="left:28%;top:40%"></span>
+          <span class="pin" style="left:62%;top:30%"></span>
+          <span class="pin" style="left:48%;top:66%"></span>
+        </div>
+        {['Pemeliharaan taman', 'Patroli area TPU', 'Penyiraman'].map((x, i) => (
+          <div class="flex items-center gap-1.5 rounded-md bg-surface-2 px-2 py-1.5">
+            <span class:list={['size-1.5 rounded-full', i === 0 ? 'bg-accent' : 'bg-fg-subtle']}></span>
+            <span class="truncate text-[9px] text-fg-muted">{x}</span>
+          </div>
+        ))}
+        <div class="rounded-md bg-accent py-1.5 text-center text-[9px] font-semibold text-accent-contrast">+ Tambah kegiatan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Badge mengambang -->
+  <div class="mock-badge absolute -right-2 top-10 hidden items-center gap-2 rounded-xl border border-border bg-surface/90 px-3 py-2 shadow-lg backdrop-blur sm:flex">
+    <span class="relative flex size-2"><span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span><span class="relative inline-flex size-2 rounded-full bg-accent"></span></span>
+    <span class="font-mono text-[10px] text-fg-muted">Sinkron · online</span>
+  </div>
+</div>
+
+<style>
+  .mock-window { box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6), 0 0 0 1px var(--border); }
+  .bar { background: linear-gradient(to top, color-mix(in srgb, var(--accent) 35%, transparent), var(--accent)); opacity: 0.85; }
+  .map-dummy {
+    background:
+      linear-gradient(135deg, transparent 45%, color-mix(in srgb, var(--accent) 25%, transparent) 46% 48%, transparent 49%),
+      linear-gradient(45deg, transparent 60%, var(--border-strong) 61% 62%, transparent 63%),
+      repeating-linear-gradient(0deg, var(--surface-2) 0 10px, var(--surface) 10px 20px);
+  }
+  .pin { position: absolute; width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .mock-phone { animation: var(--animate-float); }
+  .mock-badge { animation: var(--animate-float); animation-delay: -3s; }
+</style>

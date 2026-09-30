@@ -1,0 +1,20 @@
+---
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogIndex from '@/components/BlogIndex.astro';
+import { getPosts, slugify } from '@/lib/content';
+import { BLOG_CATEGORIES } from '@/content.config';
+
+export async function getStaticPaths() {
+  const all = await getPosts();
+  return BLOG_CATEGORIES.filter((c) => all.some((p) => p.data.category === c)).map((category) => ({
+    params: { kategori: slugify(category) },
+    props: { all, category, posts: all.filter((p) => p.data.category === category) },
+  }));
+}
+const { all, category, posts } = Astro.props;
+---
+<BaseLayout title={`Kategori ${category}`} description={`Artikel Cendera dalam kategori ${category}.`}>
+  <BlogIndex title={category} lead={`${posts.length} artikel dalam kategori ini.`} posts={posts} allPosts={all} activeCategory={category}
+    crumbs={[{ label: 'Blog', href: '/blog' }]} />
+</BaseLayout>

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import '@/styles/prose.css';
+interface Props { title: string; description: string; updated: string }
+// Halaman Markdown mengirim front matter lewat `frontmatter`.
+const { title, description, updated } = ((Astro.props as any).frontmatter ?? Astro.props) as Props;
+---
+<BaseLayout title={title} description={description}>
+  <PageHeader eyebrow="Legal" title={title} lead={`Terakhir diperbarui: ${updated}`} />
+  <div class="container-site py-12 lg:py-16">
+    <div class="prose-cendera"><slot /></div>
+  </div>
+</BaseLayout>

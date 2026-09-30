@@ -1,0 +1,21 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/Logo.astro';
+import { whatsappLink } from '@/data/site';
+---
+<section class="container-site py-10" aria-labelledby="cta-title">
+  <div class="cta relative isolate overflow-hidden rounded-[1.75rem] border border-border px-6 py-16 text-center sm:px-12 lg:py-20" data-reveal>
+    <div class="hex-pattern hex-mask animate-drift absolute inset-0 -z-10 opacity-30" aria-hidden="true"></div>
+    <Logo variant="outline" class="pointer-events-none absolute -left-10 -top-10 -z-10 h-[140%] text-accent opacity-10" />
+    <p class="eyebrow justify-center">Mulai sekarang</p>
+    <h2 id="cta-title" class="mx-auto mt-4 max-w-3xl font-display text-3xl font-bold sm:text-5xl">Punya ide? Mari wujudkan bersama.</h2>
+    <p class="mx-auto mt-5 max-w-xl text-fg-muted sm:text-lg">Ceritakan kebutuhan Anda. Kami balas dalam 1×24 jam kerja dengan langkah awal yang jelas — gratis, tanpa komitmen.</p>
+    <div class="mt-9 flex flex-wrap justify-center gap-3">
+      <a href="#kontak" class="btn btn-primary !px-6">Mulai Proyek <Icon name="arrow-right" class="arrow size-4" /></a>
+      <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" class="btn btn-secondary !px-6"><Icon name="message-circle" class="size-4" /> Chat WhatsApp</a>
+    </div>
+  </div>
+</section>
+<style>
+  .cta { background: radial-gradient(ellipse at top, var(--accent-soft), transparent 65%), var(--surface); }
+</style>

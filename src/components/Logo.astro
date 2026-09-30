@@ -1,0 +1,35 @@
+---
+/**
+ * Logo Cendera.
+ * - variant="mark"     : simbol saja
+ * - variant="lockup"   : simbol + wordmark "Cendera"
+ * - variant="outline"  : garis tepi transparan (dekorasi besar di hero)
+ * Warna simbol selalu hijau brand #00D40E (tidak berubah per tema); wordmark mengikuti warna teks.
+ */
+import logo from '@/assets/brand/logo-path.json';
+
+interface Props {
+  variant?: 'mark' | 'lockup' | 'outline';
+  class?: string;
+  /** Tinggi simbol dalam px (navbar: 38). */
+  height?: number;
+  title?: string;
+}
+const { variant = 'lockup', class: className = '', height = 38, title = 'Cendera' } = Astro.props;
+const [, , vw, vh] = logo.viewBox.split(' ').map(Number);
+const width = Math.round((height * vw) / vh);
+---
+{variant === 'outline' ? (
+  <svg viewBox={logo.viewBox} class={className} aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.5">
+    <use href="#cendera-logo" />
+  </svg>
+) : (
+  <span class:list={['inline-flex items-center gap-2.5', className]}>
+    <svg width={width} height={height} viewBox={logo.viewBox} role="img" aria-label={variant === 'mark' ? title : undefined} aria-hidden={variant === 'lockup' ? 'true' : undefined} class="shrink-0 text-brand" fill="currentColor">
+      <use href="#cendera-logo" />
+    </svg>
+    {variant === 'lockup' && (
+      <span class="font-display text-[1.35rem] font-bold tracking-tight text-fg leading-none">{title}</span>
+    )}
+  </span>
+)}

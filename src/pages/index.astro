@@ -1,0 +1,42 @@
+---
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import TrustStats from '@/components/sections/TrustStats.astro';
+import Services from '@/components/sections/Services.astro';
+import FeaturedProjects from '@/components/sections/FeaturedProjects.astro';
+import Process from '@/components/sections/Process.astro';
+import TechStack from '@/components/sections/TechStack.astro';
+import About from '@/components/sections/About.astro';
+import Team from '@/components/sections/Team.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import LatestPosts from '@/components/sections/LatestPosts.astro';
+import Faq from '@/components/sections/Faq.astro';
+import ClosingCta from '@/components/sections/ClosingCta.astro';
+import Contact from '@/components/sections/Contact.astro';
+import { SITE } from '@/data/site';
+
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  url: Astro.site?.href,
+  inLanguage: 'id-ID',
+  publisher: { '@id': new URL('/#organization', Astro.site).href },
+};
+---
+<BaseLayout jsonLd={websiteLd}>
+  <Hero />
+  <TrustStats />
+  <Services />
+  <FeaturedProjects />
+  <Process />
+  <TechStack />
+  <About />
+  <Team />
+  <Testimonials />
+  <LatestPosts />
+  <Faq />
+  <ClosingCta />
+  <Contact />
+</BaseLayout>

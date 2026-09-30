@@ -1,0 +1,34 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { testimonials } from '@/data/home.id';
+---
+<section id="testimoni" class="section overflow-hidden" aria-labelledby="testimoni-title">
+  <div class="container-site">
+    <SectionHeading id="testimoni-title" eyebrow="Testimoni" title="Kata mereka yang sudah bekerja bersama kami." />
+    <!-- Mobile: carousel (scroll-snap, bisa digeser/keyboard). Desktop: grid 3 kolom. -->
+    <ul class="testi-track -mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0"
+      tabindex="0" aria-label="Daftar testimoni, geser untuk melihat lainnya">
+      {testimonials.map((t, i) => (
+        <li class="card flex w-[85%] shrink-0 snap-center flex-col p-7 md:w-auto" data-reveal style={`--reveal-delay:${i * 90}ms`}>
+          <Icon name="quote" class="size-8 text-accent-ink" />
+          <blockquote class="mt-5 flex-1 text-[1.02rem] leading-relaxed text-fg">“{t.quote}”</blockquote>
+          <div class="mt-7 flex items-center gap-3 border-t border-border pt-5">
+            <span class="flex size-11 items-center justify-center rounded-full bg-surface-2 font-display font-semibold text-fg-muted" aria-hidden="true">
+              {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
+            </span>
+            <div>
+              <p class="font-semibold">{t.name}</p>
+              <p class="text-sm text-fg-muted">{t.role}</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="mt-2 text-center font-mono text-xs text-fg-subtle md:hidden" aria-hidden="true">← geser →</p>
+  </div>
+</section>
+<style>
+  .testi-track { scrollbar-width: none; }
+  .testi-track::-webkit-scrollbar { display: none; }
+</style>

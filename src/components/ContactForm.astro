@@ -1,0 +1,73 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Turnstile from '@/components/Turnstile.astro';
+import { serviceOptions, budgetOptions } from '@/data/home.id';
+import { useTranslations } from '@/i18n/ui';
+const t = useTranslations();
+---
+<form action="/api/kontak" method="post" data-api-form novalidate class="card space-y-5 p-6 sm:p-8"
+  data-loading-text={t('form.sending')} data-success-text={t('form.success')} data-error-text={t('form.error')}>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="k-name" class="mb-2 block text-sm font-medium">Nama <span class="text-accent-ink" aria-hidden="true">*</span></label>
+      <input id="k-name" name="name" type="text" required minlength="2" maxlength="100" autocomplete="name" class="field" placeholder="Nama lengkap" aria-describedby="k-name-err" />
+      <p id="k-name-err" data-error-for="name" hidden class="field-error"></p>
+    </div>
+    <div>
+      <label for="k-email" class="mb-2 block text-sm font-medium">Email <span class="text-accent-ink" aria-hidden="true">*</span></label>
+      <input id="k-email" name="email" type="email" required autocomplete="email" class="field" placeholder="nama@perusahaan.com" aria-describedby="k-email-err" />
+      <p id="k-email-err" data-error-for="email" hidden class="field-error"></p>
+    </div>
+    <div>
+      <label for="k-service" class="mb-2 block text-sm font-medium">Jenis layanan <span class="text-accent-ink" aria-hidden="true">*</span></label>
+      <select id="k-service" name="service" required class="field" aria-describedby="k-service-err">
+        <option value="">Pilih layanan…</option>
+        {serviceOptions.map((s) => <option value={s}>{s}</option>)}
+      </select>
+      <p id="k-service-err" data-error-for="service" hidden class="field-error"></p>
+    </div>
+    <div>
+      <label for="k-budget" class="mb-2 block text-sm font-medium">Perkiraan anggaran <span class="text-fg-subtle">(opsional)</span></label>
+      <select id="k-budget" name="budget" class="field">
+        {budgetOptions.map((b) => <option value={b}>{b}</option>)}
+      </select>
+    </div>
+  </div>
+  <div>
+    <label for="k-message" class="mb-2 block text-sm font-medium">Pesan <span class="text-accent-ink" aria-hidden="true">*</span></label>
+    <textarea id="k-message" name="message" required minlength="20" maxlength="4000" rows="5" class="field resize-y"
+      placeholder="Ceritakan singkat tujuan, pengguna, dan target waktu proyek Anda." aria-describedby="k-message-err"></textarea>
+    <p id="k-message-err" data-error-for="message" hidden class="field-error"></p>
+  </div>
+
+  <!-- Honeypot anti-bot: jangan dihapus. Disembunyikan dari pengguna & pembaca layar. -->
+  <div class="hidden" aria-hidden="true">
+    <label>Perusahaan (jangan diisi) <input type="text" name="company_website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <Turnstile action="kontak" />
+
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-xs text-fg-subtle">Dengan mengirim, Anda menyetujui <a href="/kebijakan-privasi" class="underline underline-offset-2 hover:text-fg">Kebijakan Privasi</a> kami.</p>
+    <button type="submit" class="btn btn-primary !px-6">
+      <span class="btn-label">Kirim Pesan</span>
+      <span class="btn-idle"><Icon name="send" class="size-4" /></span>
+      <span class="btn-spin"><Icon name="loader-circle" class="size-4 animate-spin" /></span>
+    </button>
+  </div>
+  <p data-form-status role="status" aria-live="polite" hidden class="form-status rounded-xl border p-4 text-sm"></p>
+</form>
+<script>
+  import '@/scripts/forms';
+</script>
+<style>
+  .field-error { margin-top: 0.4rem; font-size: 0.8rem; color: #f87171; }
+  :global([data-theme='light']) .field-error { color: #b91c1c; }
+  .btn-spin { display: none; }
+  form[data-state='loading'] .btn-spin { display: inline-flex; }
+  form[data-state='loading'] .btn-idle { display: none; }
+  button:disabled { opacity: 0.7; cursor: progress; }
+  .form-status[data-state='success'] { border-color: color-mix(in srgb, var(--accent) 50%, transparent); background: var(--accent-soft); color: var(--fg); }
+  .form-status[data-state='error'] { border-color: rgb(248 113 113 / 0.5); background: rgb(248 113 113 / 0.08); color: var(--fg); }
+  .form-status[data-state='loading'] { border-color: var(--border); color: var(--fg-muted); }
+</style>

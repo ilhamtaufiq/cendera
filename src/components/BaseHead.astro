@@ -1,0 +1,113 @@
+---
+/**
+ * <head>: meta dasar, canonical, Open Graph, Twitter Card, JSON-LD, favicon, RSS, analitik opsional.
+ */
+import { SITE, CONTACT, SOCIALS } from '@/data/site';
+
+export interface SeoProps {
+  title?: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  author?: string;
+  tags?: string[];
+  noindex?: boolean;
+  /** JSON-LD tambahan khusus halaman (Article, CreativeWork, BreadcrumbList, ...). */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = SITE.ogImage,
+  imageAlt = `${SITE.name} — ${SITE.tagline}`,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  author,
+  tags = [],
+  noindex = false,
+  jsonLd,
+} = Astro.props as SeoProps;
+
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — Teknologi, Aplikasi & Kreatif`;
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const ogImage = new URL(image, Astro.site).href;
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': new URL('/#organization', Astro.site).href,
+  name: SITE.legalName,
+  alternateName: SITE.name,
+  url: Astro.site?.href,
+  logo: new URL(SITE.logo, Astro.site).href,
+  description: SITE.description,
+  foundingDate: String(SITE.foundingYear),
+  email: CONTACT.email,
+  telephone: `+${CONTACT.whatsapp}`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CONTACT.address.street,
+    addressLocality: CONTACT.address.city,
+    addressRegion: CONTACT.address.region,
+    postalCode: CONTACT.address.postalCode,
+    addressCountry: CONTACT.address.country,
+  },
+  sameAs: SOCIALS.map((s) => s.href),
+};
+const ldList = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+
+const cfBeacon = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
+const umamiSrc = import.meta.env.PUBLIC_UMAMI_SRC;
+const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical.href} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+<meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content={SITE.themeColor} />
+<meta name="color-scheme" content="dark light" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="alternate" type="application/rss+xml" title={`Blog ${SITE.name}`} href="/rss.xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<!-- i18n: saat versi Inggris tersedia, tambahkan <link rel="alternate" hreflang="en" ...> -->
+<link rel="alternate" hreflang="id" href={canonical.href} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content="id_ID" />
+<meta property="og:title" content={title ?? fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical.href} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={imageAlt} />
+{publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
+{author && <meta property="article:author" content={author} />}
+{tags.map((t) => <meta property="article:tag" content={t} />)}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title ?? fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+{ldList.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
+
+{cfBeacon && (
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfBeacon })} />
+)}
+{umamiSrc && umamiId && <script defer src={umamiSrc} data-website-id={umamiId} />}

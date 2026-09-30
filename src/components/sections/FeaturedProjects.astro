@@ -1,0 +1,56 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { getProjects } from '@/lib/content';
+import { useTranslations } from '@/i18n/ui';
+const t = useTranslations();
+
+// Proyek `featured: true` (maks. 4). Proyek dengan `ecosystem` yang sama dikelompokkan berdampingan.
+const featured = (await getProjects()).filter((p) => p.data.featured).slice(0, 4);
+const standalone = featured.filter((p) => !p.data.ecosystem);
+const ecosystems = Object.entries(
+  Object.groupBy(featured.filter((p) => p.data.ecosystem), (p) => p.data.ecosystem!),
+);
+---
+<section id="proyek" class="section bg-bg-elevated" aria-labelledby="proyek-title">
+  <div class="container-site">
+    <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+      <SectionHeading id="proyek-title" eyebrow="Proyek Unggulan" title="Produk yang berjalan setiap hari."
+        lead="Beberapa sistem yang kami bangun dan rawat — dipakai oleh petugas lapangan, pelaku usaha, hingga warga." />
+      <a href="/proyek" class="btn btn-secondary shrink-0" data-reveal>{t('cta.allProjects')} <Icon name="arrow-right" class="arrow size-4" /></a>
+    </div>
+
+    {standalone.length > 0 && (
+      <ul class="mt-14 grid gap-5 md:grid-cols-2">
+        {standalone.map((p, i) => (
+          <li data-reveal style={`--reveal-delay:${i * 100}ms`}><ProjectCard project={p} size="lg" /></li>
+        ))}
+      </ul>
+    )}
+
+    {ecosystems.map(([name, items]) => (
+      <div class="eco relative mt-8 rounded-[1.4rem] border border-border p-4 sm:p-6" data-reveal>
+        <div class="flex flex-col gap-3 px-2 pb-5 pt-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="eyebrow">Ekosistem</p>
+            <h3 class="mt-2 font-display text-2xl font-semibold">{name}</h3>
+          </div>
+          <p class="max-w-md text-sm text-fg-muted">Dua aplikasi yang saling terhubung: satu untuk operasional internal petugas, satu untuk layanan publik warga.</p>
+        </div>
+        <ul class="relative grid gap-5 md:grid-cols-2">
+          {items!.map((p) => <li><ProjectCard project={p} /></li>)}
+          <li aria-hidden="true" class="eco-link pointer-events-none absolute left-1/2 top-[30%] z-10 hidden -translate-x-1/2 md:flex">
+            <span class="flex size-11 items-center justify-center rounded-full border border-accent bg-bg text-accent-ink shadow-lg">
+              <Icon name="arrow-left-right" class="size-5" />
+            </span>
+          </li>
+        </ul>
+        <p class="sr-only">Kedua aplikasi saling terintegrasi.</p>
+      </div>
+    ))}
+  </div>
+</section>
+<style>
+  .eco { background: linear-gradient(180deg, var(--accent-soft), transparent 55%); }
+</style>

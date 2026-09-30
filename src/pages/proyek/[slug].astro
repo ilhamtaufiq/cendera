@@ -1,0 +1,144 @@
+---
+export const prerender = true;
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Toc from '@/components/Toc.astro';
+import ShareButtons from '@/components/ShareButtons.astro';
+import Icon from '@/components/ui/Icon.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import '@/styles/prose.css';
+import { getProjects, projectSlug, type Project } from '@/lib/content';
+import { SITE } from '@/data/site';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  // Validasi `related`: build gagal bila slug terkait tidak ada.
+  const slugs = new Set(projects.map(projectSlug));
+  for (const p of projects)
+    for (const r of p.data.related)
+      if (!slugs.has(r)) throw new Error(`[proyek/${p.id}] related "${r}" tidak ditemukan`);
+  return projects.map((project) => ({ params: { slug: projectSlug(project) }, props: { project, projects } }));
+}
+
+interface Props { project: Project; projects: Project[] }
+const { project, projects } = Astro.props;
+const d = project.data;
+const { Content, headings } = await render(project);
+const related = d.related.map((r) => projects.find((p) => projectSlug(p) === r)!).filter(Boolean);
+const url = new URL(Astro.url.pathname, Astro.site).href;
+
+const creativeWork = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: `${d.title} — ${d.subtitle}`,
+  headline: d.title,
+  description: d.summary,
+  image: new URL(d.cover, Astro.site).href,
+  url,
+  dateCreated: String(d.year),
+  inLanguage: 'id-ID',
+  keywords: d.tech.join(', '),
+  genre: d.category,
+  creator: { '@id': new URL('/#organization', Astro.site).href },
+  ...(d.links.live ? { sameAs: d.links.live } : {}),
+};
+---
+<BaseLayout title={`${d.title} — ${d.subtitle}`} description={d.summary} image={d.cover} imageAlt={d.coverAlt ?? d.title} jsonLd={creativeWork}>
+  <article data-pagefind-body data-pagefind-filter="tipe:proyek">
+    <PageHeader eyebrow={`${d.category} · ${d.type.join(' + ')}`} title={d.title} lead={d.subtitle} crumbs={[{ label: 'Proyek', href: '/proyek' }]}>
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        {d.links.live && (
+          <a href={d.links.live} target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            {d.links.liveLabel} <Icon name="arrow-up-right" class="size-4" />
+          </a>
+        )}
+        {d.links.repo && (
+          <a href={d.links.repo} target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <BrandIcon slug="github" class="size-4" /> Repositori
+          </a>
+        )}
+        {!d.links.repo && <span class="chip"><Icon name="lock" class="size-3.5" /> Kode proprietary</span>}
+        {d.audience && <span class="chip chip-accent">{d.audience}</span>}
+      </div>
+    </PageHeader>
+
+    <div class="container-site">
+      <figure class="-mt-px pt-10">
+        <img src={d.cover} alt={d.coverAlt ?? `Mockup ${d.title}`} width="1600" height="1000" fetchpriority="high"
+          class="w-full rounded-2xl border border-border" />
+        <figcaption class="mt-3 text-center text-xs text-fg-subtle">Ilustrasi antarmuka menggunakan data dummy.</figcaption>
+      </figure>
+
+      <!-- Ringkasan proyek -->
+      <dl class="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        {[['Klien', d.client], ['Tahun', String(d.year)], ['Status', d.status], ['Jenis', d.type.join(', ')]].map(([k, v]) => (
+          <div class="bg-surface p-5">
+            <dt class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">{k}</dt>
+            <dd class="mt-2 font-medium">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {d.metrics.length > 0 && (
+        <ul class="mt-6 grid gap-4 sm:grid-cols-3" aria-label="Metrik">
+          {d.metrics.map((m) => (
+            <li class="card p-6">
+              <p class="font-display text-3xl font-bold text-accent-ink">{m.value}</p>
+              <p class="mt-1 text-sm text-fg-muted">{m.label}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div class="grid gap-12 py-14 lg:grid-cols-[1fr_17rem]">
+        <div class="min-w-0">
+          <p class="text-xl leading-relaxed text-fg">{d.summary}</p>
+          <div class="prose-cendera mt-8">
+            <Content />
+          </div>
+
+          {d.gallery.length > 0 && (
+            <section class="mt-14" aria-labelledby="galeri">
+              <h2 id="galeri" class="font-display text-2xl font-semibold">Galeri</h2>
+              <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+                {d.gallery.map((g, i) => (
+                  <li><img src={g} alt={`Tampilan ${d.title} ${i + 1} (data dummy)`} width="1600" height="1000" loading="lazy" decoding="async" class="w-full rounded-xl border border-border" /></li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <div class="mt-12 border-t border-border pt-8"><ShareButtons title={`${d.title} — ${SITE.name}`} url={url} /></div>
+        </div>
+
+        <aside class="space-y-8 lg:sticky lg:top-24 lg:self-start">
+          <Toc headings={headings} />
+          <div>
+            <p class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Teknologi</p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {d.tech.map((t) => <li class="chip">{t}</li>)}
+            </ul>
+          </div>
+          <div class="card p-5">
+            <p class="font-display font-semibold">Butuh sistem serupa?</p>
+            <p class="mt-2 text-sm text-fg-muted">Ceritakan kebutuhan Anda, kami bantu petakan solusinya.</p>
+            <a href="/#kontak" class="btn btn-primary mt-4 w-full">Mulai Proyek</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="border-t border-border bg-bg-elevated py-16" aria-labelledby="terkait">
+      <div class="container-site">
+        <h2 id="terkait" class="font-display text-2xl font-semibold">Proyek terkait</h2>
+        <ul class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {related.map((p) => <li><ProjectCard project={p} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>

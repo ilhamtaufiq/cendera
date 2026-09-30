@@ -1,0 +1,77 @@
+---
+import Logo from '@/components/Logo.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import Icon from '@/components/ui/Icon.astro';
+import NewsletterForm from '@/components/NewsletterForm.astro';
+import { NAV, SITE, SOCIALS, CONTACT, whatsappLink } from '@/data/site';
+import { useTranslations } from '@/i18n/ui';
+const t = useTranslations();
+const year = 2026;
+
+const explore = [
+  { label: 'Semua Proyek', href: '/proyek' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Karier', href: '/karier' },
+  { label: 'RSS', href: '/rss.xml' },
+];
+---
+<footer class="relative mt-auto overflow-hidden border-t border-border bg-bg-elevated">
+  <div class="divider-circuit absolute inset-x-0 top-0"></div>
+  <div class="container-site grid gap-12 py-16 lg:grid-cols-12">
+    <div class="lg:col-span-3">
+      <a href="/" aria-label={`${SITE.name} — Beranda`} class="inline-block rounded-lg"><Logo height={40} /></a>
+      <p class="mt-5 max-w-sm text-sm leading-relaxed text-fg-muted">
+        Studio teknologi dan kreatif yang membangun aplikasi mobile, web, sistem bisnis, dan solusi govtech — dari ide hingga produk yang benar-benar dipakai.
+      </p>
+      <ul class="mt-6 flex gap-2" aria-label="Media sosial">
+        {SOCIALS.map((s) => (
+          <li>
+            <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}
+              class="inline-flex size-10 items-center justify-center rounded-xl border border-border text-fg-muted transition hover:border-accent hover:text-accent-ink">
+              <BrandIcon slug={s.icon} name={s.name} class="size-[18px]" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <nav class="grid grid-cols-2 gap-8 sm:grid-cols-[1fr_1fr_1.7fr] lg:col-span-5" aria-label="Navigasi footer">
+      <div>
+        <h2 class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Navigasi</h2>
+        <ul class="mt-4 space-y-3 text-sm">
+          {NAV.map((n) => <li><a class="text-fg-muted transition hover:text-fg" href={n.href}>{n.label}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Jelajahi</h2>
+        <ul class="mt-4 space-y-3 text-sm">
+          {explore.map((n) => <li><a class="text-fg-muted transition hover:text-fg" href={n.href}>{n.label}</a></li>)}
+        </ul>
+      </div>
+      <div class="col-span-2 sm:col-span-1">
+        <h2 class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Kontak</h2>
+        <ul class="mt-4 space-y-3 text-sm text-fg-muted">
+          <li><a class="inline-flex items-center gap-2 hover:text-fg" href={`mailto:${CONTACT.email}`}><Icon name="mail" class="size-4" />{CONTACT.email}</a></li>
+          <li><a class="inline-flex items-center gap-2 hover:text-fg" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><Icon name="phone" class="size-4" />{CONTACT.whatsappDisplay}</a></li>
+          <li class="inline-flex items-start gap-2"><Icon name="map-pin" class="size-4 mt-0.5 shrink-0" />{CONTACT.address.city}, {CONTACT.address.region}</li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="lg:col-span-4">
+      <h2 class="font-display text-lg font-semibold">Kabar dari Cendera</h2>
+      <p class="mt-2 text-sm text-fg-muted">Artikel teknologi & studi kasus terbaru, maksimal dua kali sebulan. Tanpa spam.</p>
+      <div class="mt-4"><NewsletterForm idPrefix="footer-nl" /></div>
+    </div>
+  </div>
+
+  <div class="border-t border-border">
+    <div class="container-site flex flex-col items-start justify-between gap-3 py-6 text-xs text-fg-subtle sm:flex-row sm:items-center">
+      <p>© {year} {SITE.name}. {t('footer.rights')}</p>
+      <ul class="flex gap-5">
+        <li><a class="hover:text-fg" href="/kebijakan-privasi">Kebijakan Privasi</a></li>
+        <li><a class="hover:text-fg" href="/syarat-ketentuan">Syarat &amp; Ketentuan</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

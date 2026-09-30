@@ -1,0 +1,19 @@
+---
+/**
+ * Ikon line (Lucide). Pemakaian: <Icon name="rocket" class="size-5" />
+ * Nama mengikuti https://lucide.dev/icons (kebab-case).
+ */
+import * as icons from '@lucide/astro';
+
+interface Props {
+  name: string;
+  class?: string;
+  strokeWidth?: number;
+  label?: string;
+}
+const { name, class: className = 'size-5', strokeWidth = 1.75, label } = Astro.props;
+const pascal = name.replace(/(^|-)([a-z0-9])/g, (_, __, c: string) => c.toUpperCase());
+const Cmp = (icons as Record<string, any>)[pascal];
+if (!Cmp) throw new Error(`Ikon Lucide "${name}" tidak ditemukan`);
+---
+<Cmp class={className} stroke-width={strokeWidth} aria-hidden={label ? undefined : 'true'} aria-label={label} role={label ? 'img' : undefined} />

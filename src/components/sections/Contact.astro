@@ -1,0 +1,82 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import Icon from '@/components/ui/Icon.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import { CONTACT, SOCIALS, whatsappLink } from '@/data/site';
+const addr = CONTACT.address;
+---
+<section id="kontak" class="section" aria-labelledby="kontak-title">
+  <div class="container-site grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <SectionHeading id="kontak-title" eyebrow="Kontak" title="Mari bicarakan proyek Anda."
+        lead="Isi form atau hubungi kami langsung. Konsultasi awal gratis — kami akan membantu memetakan kebutuhan dan langkah pertama." />
+
+      <ul class="mt-10 space-y-3" data-reveal>
+        <li>
+          <a href={`mailto:${CONTACT.email}`} class="contact-row">
+            <Icon name="mail" class="size-5 text-accent-ink" />
+            <span><span class="block text-xs text-fg-subtle">Email</span>{CONTACT.email}</span>
+          </a>
+        </li>
+        <li>
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" class="contact-row">
+            <BrandIcon slug="whatsapp" class="size-5 text-accent-ink" />
+            <span><span class="block text-xs text-fg-subtle">WhatsApp</span>{CONTACT.whatsappDisplay}</span>
+          </a>
+        </li>
+        <li class="contact-row">
+          <Icon name="clock" class="size-5 text-accent-ink" />
+          <span class="flex-1">
+            <span class="block text-xs text-fg-subtle">Jam kerja</span>
+            <span class="mt-1 grid gap-0.5 text-sm">
+              {CONTACT.hours.map((h) => <span class="flex justify-between gap-4"><span>{h.days}</span><span class="text-fg-muted">{h.time}</span></span>)}
+            </span>
+          </span>
+        </li>
+      </ul>
+
+      <!-- Peta statis (tanpa iframe pihak ketiga → cepat & ramah privasi). Klik untuk membuka Google Maps. -->
+      <a href={CONTACT.mapUrl} target="_blank" rel="noopener noreferrer" class="map card mt-4 block overflow-hidden" data-reveal
+        aria-label={`Buka lokasi ${addr.street}, ${addr.city} di Google Maps`}>
+        <svg viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice" class="h-40 w-full" aria-hidden="true">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0v20" fill="none" stroke="var(--border)" stroke-width="1" /></pattern>
+          </defs>
+          <rect width="400" height="180" fill="var(--surface-2)" />
+          <rect width="400" height="180" fill="url(#grid)" />
+          <path d="M-10 130 C 80 110, 140 150, 220 100 S 360 60, 420 80" fill="none" stroke="var(--border-strong)" stroke-width="10" />
+          <path d="M150 -10 L 180 200" fill="none" stroke="var(--border-strong)" stroke-width="6" />
+          <path d="M260 -10 C 250 60, 300 120, 290 200" fill="none" stroke="var(--border-strong)" stroke-width="4" />
+          <circle cx="200" cy="88" r="28" fill="var(--accent)" opacity="0.15" />
+          <path d="M200 58c-11 0-19 8.5-19 19 0 14 19 31 19 31s19-17 19-31c0-10.5-8-19-19-19z" fill="var(--accent)" />
+          <circle cx="200" cy="77" r="6.5" fill="#0A0A0A" />
+        </svg>
+        <span class="flex items-start gap-3 border-t border-border p-4 text-sm">
+          <Icon name="map-pin" class="mt-0.5 size-4 shrink-0 text-accent-ink" />
+          <span>
+            <address class="not-italic">{addr.street}, {addr.city}, {addr.region} {addr.postalCode}</address>
+            <span class="mt-1 inline-flex items-center gap-1 text-xs text-accent-ink">Buka di Google Maps <Icon name="arrow-up-right" class="size-3" /></span>
+          </span>
+        </span>
+      </a>
+
+      <ul class="mt-6 flex gap-2" aria-label="Media sosial" data-reveal>
+        {SOCIALS.map((s) => (
+          <li><a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}
+            class="inline-flex size-10 items-center justify-center rounded-xl border border-border text-fg-muted transition hover:border-accent hover:text-accent-ink">
+            <BrandIcon slug={s.icon} name={s.name} class="size-[18px]" /></a></li>
+        ))}
+      </ul>
+    </div>
+    <div class="lg:col-span-7" data-reveal style="--reveal-delay:120ms">
+      <ContactForm />
+    </div>
+  </div>
+</section>
+<style>
+  .contact-row { display: flex; align-items: flex-start; gap: 0.9rem; padding: 0.9rem 1rem; border: 1px solid var(--border); border-radius: 0.875rem; background: var(--surface); transition: border-color 0.2s; }
+  a.contact-row:hover { border-color: var(--accent); }
+  .map { transition: border-color 0.2s; }
+  .map:hover { border-color: var(--accent); }
+</style>

@@ -1,0 +1,31 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Turnstile from '@/components/Turnstile.astro';
+interface Props { idPrefix?: string }
+const { idPrefix = 'nl' } = Astro.props;
+---
+<form action="/api/newsletter" method="post" data-api-form novalidate class="newsletter-form space-y-3"
+  data-success-text="Berhasil! Cek email Anda untuk artikel berikutnya dari kami.">
+  <div class="flex flex-col gap-2 sm:flex-row">
+    <label for={`${idPrefix}-email`} class="sr-only">Alamat email</label>
+    <input id={`${idPrefix}-email`} name="email" type="email" required autocomplete="email" placeholder="nama@email.com" class="field flex-1" />
+    <button type="submit" class="btn btn-primary">
+      Berlangganan <Icon name="send" class="size-4" />
+    </button>
+  </div>
+  <!-- Honeypot: disembunyikan dari manusia; bot yang mengisinya akan ditolak. -->
+  <div class="hidden" aria-hidden="true">
+    <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+  <p data-error-for="email" hidden class="text-sm text-red-400"></p>
+  <Turnstile action="newsletter" />
+  <p data-form-status role="status" aria-live="polite" hidden class="form-status text-sm"></p>
+</form>
+<script>
+  import '@/scripts/forms';
+</script>
+<style>
+  .form-status[data-state='success'] { color: var(--accent-ink); }
+  .form-status[data-state='error'] { color: #f87171; }
+  :global([data-theme='light']) .form-status[data-state='error'] { color: #b91c1c; }
+</style>

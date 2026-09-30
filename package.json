@@ -1,0 +1,40 @@
+{
+  "name": "cendera-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Situs company profile Cendera — Astro + Markdown di Git, dijalankan di Cloudflare Workers.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/postbuild.mjs",
+    "preview": "astro build && node scripts/postbuild.mjs && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "check": "astro check",
+    "images": "node scripts/generate-images.mjs",
+    "cf-typegen": "wrangler types --include-runtime=false"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.3.3",
+    "@astrojs/markdown-remark": "^7.3.1",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@lucide/astro": "^1.49.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "rehype-autolink-headings": "^7.1.0",
+    "simple-icons": "^16.33.0",
+    "tailwindcss": "^4.3.3",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "pagefind": "^1.5.2",
+    "potrace": "^2.1.8",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.144.0"
+  }
+}

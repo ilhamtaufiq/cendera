@@ -1,0 +1,15 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { useTranslations } from '@/i18n/ui';
+const t = useTranslations();
+---
+<button type="button" data-theme-toggle aria-pressed="false" aria-label={t('theme.toggle')} title={t('theme.toggle')}
+  class="inline-flex size-10 items-center justify-center rounded-xl border border-border text-fg-muted transition hover:border-accent hover:text-fg">
+  <!-- Ikon dibungkus <span> agar selector scoped Astro berlaku -->
+  <span class="theme-icon-sun"><Icon name="sun" class="size-[18px]" /></span>
+  <span class="theme-icon-moon"><Icon name="moon" class="size-[18px]" /></span>
+</button>
+<style>
+  :global([data-theme='light']) .theme-icon-sun { display: none; }
+  :global(:root:not([data-theme='light'])) .theme-icon-moon { display: none; }
+</style>

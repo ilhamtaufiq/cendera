@@ -1,0 +1,54 @@
+/**
+ * Konfigurasi Cloudflare Workers untuk cendera-web.
+ * Dokumentasi: https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * Catatan arsitektur (Astro 7 + @astrojs/cloudflare 14):
+ * - `main` menunjuk entrypoint adapter. Saat `astro build`, plugin Vite Cloudflare
+ *   membundel Worker ke dist/server/ dan menulis konfigurasi hasil build
+ *   (dist/server/wrangler.json) yang otomatis dipakai `wrangler deploy` / `wrangler dev`.
+ * - Semua halaman di-prerender ke dist/client/ dan disajikan lewat Workers Static Assets.
+ *   Worker hanya dipanggil untuk rute yang tidak cocok dengan file statis (yaitu /api/*).
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cendera-web",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  // Isi dengan tanggal hari deploy saat memperbarui runtime.
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist/client",
+    // Halaman 404.html kustom untuk path yang tidak ditemukan.
+    "not_found_handling": "404-page",
+    // /api/* selalu diteruskan ke kode Worker; path lain dilayani sebagai aset statis.
+    "run_worker_first": ["/api/*"]
+  },
+
+  "observability": { "enabled": true },
+
+  // Variabel non-rahasia. Secret (API key, Turnstile secret, webhook) → `wrangler secret put`.
+  "vars": {
+    "CONTACT_TO_EMAIL": "halo@cendera.id",
+    "CONTACT_FROM_EMAIL": "Cendera Web <noreply@cendera.id>",
+    // Daftar adapter notifikasi, dipisah koma: resend | webhook | console
+    "CONTACT_NOTIFIERS": "resend",
+    "ALLOWED_ORIGINS": "https://cendera.id,https://www.cendera.id"
+  },
+
+  // Rate limit per IP untuk form (Workers Rate Limiting binding). period hanya boleh 10 atau 60 detik.
+  "ratelimits": [
+    { "name": "FORM_RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ],
+
+  // Penyimpanan email newsletter. Tanpa `id`, Wrangler membuat namespace otomatis saat deploy
+  // (automatic provisioning). Setelah dibuat, Anda boleh menuliskan id-nya di sini.
+  "kv_namespaces": [{ "binding": "NEWSLETTER" }],
+
+  // Domain kustom (Workers Custom Domains, SSL otomatis). Aktifkan setelah domain ada di akun Cloudflare.
+  // "routes": [
+  //   { "pattern": "cendera.id", "custom_domain": true },
+  //   { "pattern": "www.cendera.id", "custom_domain": true }
+  // ],
+}

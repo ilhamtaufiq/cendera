@@ -1,0 +1,39 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import BrandIcon from '@/components/ui/BrandIcon.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { getTeam } from '@/lib/content';
+const team = await getTeam();
+const socialMeta = { linkedin: 'LinkedIn', github: 'GitHub', instagram: 'Instagram', website: 'Situs web' } as const;
+---
+<section id="tim" class="section bg-bg-elevated" aria-labelledby="tim-title">
+  <div class="container-site">
+    <SectionHeading id="tim-title" eyebrow="Tim" title="Orang-orang di balik Cendera."
+      lead="Tim ramping lintas disiplin — engineer, desainer, dan kreator konten — yang terlibat langsung di setiap proyek." />
+    <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {team.map((m, i) => (
+        <li class="card card-hover overflow-hidden" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <img src={m.data.photo ?? '/images/tim/placeholder.webp'} alt={m.data.placeholder ? `Foto placeholder ${m.data.role}` : `Foto ${m.data.name}`}
+            width="600" height="600" loading="lazy" decoding="async" class="aspect-square w-full object-cover" />
+          <div class="p-5">
+            <h3 class="font-display text-lg font-semibold">{m.data.name}</h3>
+            <p class="mt-0.5 text-sm text-fg-muted">{m.data.role}</p>
+            <ul class="mt-4 flex gap-2">
+              {Object.entries(m.data.socials).filter(([, v]) => v).map(([k, v]) => (
+                <li>
+                  <a href={v} target="_blank" rel="noopener noreferrer" aria-label={`${socialMeta[k as keyof typeof socialMeta]} ${m.data.name}`}
+                    class="inline-flex size-9 items-center justify-center rounded-lg border border-border text-fg-muted transition hover:border-accent hover:text-accent-ink">
+                    {k === 'website' ? <Icon name="globe" class="size-4" /> : <BrandIcon slug={k} class="size-4" />}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="mt-10 text-center text-sm text-fg-muted" data-reveal>
+      Ingin bergabung? <a href="/karier" class="font-semibold text-accent-ink underline underline-offset-4">Lihat lowongan di halaman Karier</a>.
+    </p>
+  </div>
+</section>

@@ -1,0 +1,134 @@
+---
+/**
+ * Daftar artikel dengan pagination statis + filter kategori/tag (halaman statis) + pencarian Pagefind.
+ * Dipakai oleh /blog, /blog/halaman/[page], /blog/tag/[tag], /blog/kategori/[kategori].
+ */
+import PageHeader from '@/components/PageHeader.astro';
+import PostCard from '@/components/PostCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { BLOG_CATEGORIES } from '@/content.config';
+import { collectTags, slugify, type Post } from '@/lib/content';
+
+interface Props {
+  title: string;
+  lead?: string;
+  posts: Post[];
+  allPosts: Post[];
+  page?: { current: number; last: number; prev?: string; next?: string; base: string };
+  activeCategory?: string;
+  activeTag?: string;
+  crumbs?: { label: string; href?: string }[];
+}
+const { title, lead, posts, allPosts, page, activeCategory, activeTag, crumbs = [] } = Astro.props;
+const tags = collectTags(allPosts);
+const cats = BLOG_CATEGORIES.filter((c) => allPosts.some((p) => p.data.category === c));
+const pageHref = (n: number) => (n === 1 ? page!.base : `${page!.base === '/blog' ? '/blog/halaman' : page!.base + '/halaman'}/${n}`);
+---
+<PageHeader eyebrow="Blog" title={title} lead={lead} crumbs={crumbs}>
+  <form role="search" class="relative mt-8 max-w-xl" data-blog-search action="/blog">
+    <label for="blog-q" class="sr-only">Cari artikel</label>
+    <Icon name="search" class="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+    <input id="blog-q" type="search" placeholder="Cari artikel…" autocomplete="off" class="field !min-h-12 !pl-10" />
+  </form>
+</PageHeader>
+
+<div class="container-site py-12 lg:py-16">
+  <!-- Hasil pencarian Pagefind -->
+  <section hidden data-search-results aria-live="polite" class="mb-14">
+    <h2 class="font-display text-xl font-semibold" data-search-heading>Hasil pencarian</h2>
+    <ul class="mt-6 space-y-3" data-search-list></ul>
+  </section>
+
+  <div class="grid gap-12 lg:grid-cols-[1fr_16rem]" data-listing>
+    <div class="min-w-0">
+      <nav aria-label="Kategori" class="-mx-5 overflow-x-auto px-5 pb-2">
+        <ul class="flex gap-2">
+          <li><a href="/blog" class="chip !px-3.5 !py-1.5 !text-sm" aria-current={!activeCategory && !activeTag ? 'page' : undefined}>Semua</a></li>
+          {cats.map((c) => (
+            <li><a href={`/blog/kategori/${slugify(c)}`} class="chip !px-3.5 !py-1.5 !text-sm" aria-current={activeCategory === c ? 'page' : undefined}>{c}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      {posts.length === 0 ? (
+        <p class="card mt-8 p-10 text-center text-fg-muted">Belum ada artikel.</p>
+      ) : (
+        <ul class="mt-8 grid gap-5 md:grid-cols-2">
+          {posts.map((p, i) => <li data-reveal style={`--reveal-delay:${(i % 2) * 80}ms`}><PostCard post={p} headingLevel="h2" eager={i < 2} /></li>)}
+        </ul>
+      )}
+
+      {page && page.last > 1 && (
+        <nav aria-label="Navigasi halaman" class="mt-12 flex items-center justify-between gap-4">
+          {page.prev ? <a href={page.prev} class="btn btn-secondary" rel="prev"><Icon name="arrow-left" class="size-4" /> Sebelumnya</a> : <span></span>}
+          <ol class="flex gap-1">
+            {Array.from({ length: page.last }, (_, i) => i + 1).map((n) => (
+              <li><a href={pageHref(n)} aria-current={n === page.current ? 'page' : undefined}
+                class="pager inline-flex size-10 items-center justify-center rounded-lg border border-border text-sm font-medium">{n}</a></li>
+            ))}
+          </ol>
+          {page.next ? <a href={page.next} class="btn btn-secondary" rel="next">Berikutnya <Icon name="arrow-right" class="size-4" /></a> : <span></span>}
+        </nav>
+      )}
+    </div>
+
+    <aside class="space-y-8">
+      <div>
+        <h2 class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Tag</h2>
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {tags.map(([t, n]) => (
+            <li><a href={`/blog/tag/${t}`} class="chip" aria-current={activeTag === t ? 'page' : undefined}>#{t} <span class="opacity-60">{n}</span></a></li>
+          ))}
+        </ul>
+      </div>
+      <a href="/rss.xml" class="inline-flex items-center gap-2 text-sm text-fg-muted hover:text-accent-ink"><Icon name="rss" class="size-4" /> Langganan RSS</a>
+    </aside>
+  </div>
+</div>
+
+<style>
+  .pager[aria-current='page'] { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+  .pager:not([aria-current]):hover { border-color: var(--accent); }
+</style>
+
+<script>
+  import { pagefindResults } from '@/scripts/pagefind';
+  const input = document.getElementById('blog-q') as HTMLInputElement;
+  const box = document.querySelector<HTMLElement>('[data-search-results]')!;
+  const list = document.querySelector<HTMLUListElement>('[data-search-list]')!;
+  const heading = document.querySelector<HTMLElement>('[data-search-heading]')!;
+  const listing = document.querySelector<HTMLElement>('[data-listing]')!;
+  let timer: number | undefined;
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  async function run() {
+    const q = input.value.trim();
+    const url = new URL(location.href);
+    q ? url.searchParams.set('q', q) : url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+    if (!q) { box.hidden = true; listing.hidden = false; return; }
+    const results = await pagefindResults(q, 'blog');
+    box.hidden = false;
+    listing.hidden = true;
+    if (!results) {
+      heading.textContent = 'Pencarian tersedia setelah build (npm run build → pagefind).';
+      list.innerHTML = '';
+      return;
+    }
+    heading.textContent = results.length ? `${results.length} hasil untuk “${q}”` : `Tidak ada hasil untuk “${q}”.`;
+    // excerpt dari Pagefind sudah di-escape dan hanya berisi <mark>
+    list.innerHTML = results.map((r) => `
+      <li><a href="${esc(r.url)}" class="card card-hover block p-5">
+        <p class="font-display text-lg font-semibold">${esc(r.meta.title ?? r.url)}</p>
+        <p class="mt-2 text-sm text-fg-muted search-excerpt">${r.excerpt}</p>
+      </a></li>`).join('');
+  }
+  input.value = new URLSearchParams(location.search).get('q') ?? '';
+  input.addEventListener('input', () => { clearTimeout(timer); timer = window.setTimeout(run, 200); });
+  document.querySelector('[data-blog-search]')?.addEventListener('submit', (e) => { e.preventDefault(); run(); });
+  if (input.value) run();
+</script>
+<style is:global>
+  .search-excerpt mark { background: var(--accent-soft); color: var(--accent-ink); padding: 0 2px; border-radius: 3px; }
+</style>

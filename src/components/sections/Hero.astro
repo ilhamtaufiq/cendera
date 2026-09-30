@@ -1,0 +1,48 @@
+---
+import Logo from '@/components/Logo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import DeviceMockup from '@/components/DeviceMockup.astro';
+import { hero } from '@/data/home.id';
+import { useTranslations } from '@/i18n/ui';
+const t = useTranslations();
+---
+<section class="hero relative isolate overflow-hidden" aria-labelledby="hero-title">
+  <!-- Latar: pattern heksagonal bergerak pelan + glow hijau + logo outline besar -->
+  <div class="hex-pattern hex-mask animate-drift absolute inset-0 -z-10 opacity-25"></div>
+  <div class="hero-glow absolute right-[-8rem] top-16 -z-10 size-[38rem] rounded-full animate-pulse-soft" aria-hidden="true"></div>
+  <Logo variant="outline" class="pointer-events-none absolute -right-24 top-6 -z-10 hidden h-[118%] text-accent opacity-[0.07] lg:block" />
+
+  <div class="container-site grid items-center gap-16 pb-24 pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pb-32 lg:pt-24">
+    <div>
+      <p class="chip chip-accent font-mono !text-[0.7rem] uppercase tracking-[0.14em]" data-reveal>
+        <span class="size-1.5 rotate-45 bg-accent"></span>{hero.badge}
+      </p>
+      <h1 id="hero-title" class="mt-6 font-display text-[2.4rem] font-bold leading-[1.05] sm:text-6xl lg:text-[3.5rem] xl:text-[3.9rem]" data-reveal style="--reveal-delay:80ms">
+        {hero.titleLead} <span class="hero-accent">{hero.titleAccent}</span>
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-fg-muted" data-reveal style="--reveal-delay:160ms">{hero.subtitle}</p>
+      <div class="mt-9 flex flex-wrap gap-3" data-reveal style="--reveal-delay:240ms">
+        <a href="#kontak" class="btn btn-primary !px-6">{t('cta.startProject')} <Icon name="arrow-right" class="arrow size-4" /></a>
+        <a href="#proyek" class="btn btn-secondary !px-6">{t('cta.viewProjects')}</a>
+      </div>
+      <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-fg-muted" data-reveal style="--reveal-delay:320ms">
+        {hero.highlights.map((h) => (
+          <li class="inline-flex items-center gap-2"><Icon name="check" class="size-4 text-accent-ink" />{h}</li>
+        ))}
+      </ul>
+    </div>
+    <div class="relative lg:pl-8" data-reveal style="--reveal-delay:200ms">
+      <DeviceMockup />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-glow { background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%); filter: blur(24px); opacity: 0.7; }
+  .hero-accent {
+    background: linear-gradient(95deg, var(--accent-ink), color-mix(in srgb, var(--accent-ink) 55%, var(--fg)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

@@ -1,0 +1,50 @@
+# ALTERNATIF dari Cloudflare Workers Builds. Pakai salah satu saja agar tidak deploy dua kali.
+# Secrets repo yang dibutuhkan: CLOUDFLARE_API_TOKEN (izin "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID.
+# Variables repo (opsional, build-time): SITE_URL, PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_CF_BEACON_TOKEN.
+name: Deploy ke Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+      PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+      PUBLIC_CF_BEACON_TOKEN: ${{ vars.PUBLIC_CF_BEACON_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+
+      # main → produksi
+      - name: Deploy produksi
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # branch/PR lain → preview (versi baru tanpa mengganti produksi, dapat URL preview)
+      - name: Upload preview
+        if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
+        run: npx wrangler versions upload --preview-alias "pr-${{ github.event.pull_request.number || github.run_number }}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

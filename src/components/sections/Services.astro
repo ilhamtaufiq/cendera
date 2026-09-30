@@ -1,0 +1,40 @@
+---
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { services } from '@/data/home.id';
+---
+<section id="layanan" class="section" aria-labelledby="layanan-title">
+  <div class="container-site">
+    <SectionHeading id="layanan-title" eyebrow="Layanan" title="Satu tim untuk teknologi, aplikasi, dan kreatif."
+      lead="Dari strategi, desain, hingga kode yang berjalan di produksi — Anda cukup berbicara dengan satu tim yang memahami keseluruhan produk." />
+    <ul class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map((s, i) => (
+        <li class="card card-hover group p-6 sm:p-7" data-reveal style={`--reveal-delay:${(i % 3) * 80}ms`}>
+          <div class="svc-icon flex size-12 items-center justify-center text-accent-ink">
+            <Icon name={s.icon} class="size-6" />
+          </div>
+          <h3 class="mt-6 font-display text-xl font-semibold">{s.title}</h3>
+          <p class="mt-3 text-[0.95rem] leading-relaxed text-fg-muted">{s.desc}</p>
+          <ul class="mt-5 flex flex-wrap gap-2" aria-label="Kata kunci">
+            {s.tags.map((t) => <li class="chip">{t}</li>)}
+          </ul>
+        </li>
+      ))}
+      <li class="card flex flex-col justify-between gap-6 border-dashed p-6 sm:p-7 lg:col-span-2" data-reveal style="--reveal-delay:160ms">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.14em] text-fg-subtle">Belum yakin?</p>
+          <p class="mt-3 font-display text-xl font-semibold">Ceritakan masalahnya, kami bantu petakan solusinya.</p>
+        </div>
+        <a href="#kontak" class="btn btn-secondary self-start">Konsultasi gratis <Icon name="arrow-right" class="arrow size-4" /></a>
+      </li>
+    </ul>
+  </div>
+</section>
+<style>
+  .svc-icon {
+    background: var(--accent-soft);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .group:hover .svc-icon { background: var(--accent); color: var(--accent-contrast); }
+</style>

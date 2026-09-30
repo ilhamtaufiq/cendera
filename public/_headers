@@ -1,0 +1,33 @@
+# Header cache & keamanan untuk Workers Static Assets.
+# https://developers.cloudflare.com/workers/static-assets/headers/
+# Catatan: placeholder CSP di bawah diganti otomatis oleh scripts/postbuild.mjs (menambahkan hash script inline).
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: __CSP__
+  Cache-Control: public, max-age=0, s-maxage=300, must-revalidate
+
+# Aset ber-hash dari Astro/Vite → immutable
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Indeks pencarian Pagefind (berubah tiap build, nama file ber-hash untuk fragmen)
+/pagefind/*
+  Cache-Control: public, max-age=3600
+
+# Gambar & font statis
+/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/favicon.svg
+  Cache-Control: public, max-age=604800
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+/rss.xml
+  Cache-Control: public, max-age=0, s-maxage=900

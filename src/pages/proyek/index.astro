@@ -1,0 +1,127 @@
+---
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { getProjects, projectSlug } from '@/lib/content';
+import { PROJECT_CATEGORIES } from '@/content.config';
+
+const projects = await getProjects();
+const categories = PROJECT_CATEGORIES.filter((c) => projects.some((p) => p.data.category === c));
+---
+<BaseLayout title="Proyek" description="Portofolio Cendera: aplikasi govtech, sistem bisnis, aplikasi mobile, dan web yang kami bangun dan rawat.">
+  <PageHeader eyebrow="Portofolio" title="Proyek & studi kasus"
+    lead="Sistem yang kami rancang, bangun, dan rawat — lengkap dengan tantangan, solusi, dan hasilnya." crumbs={[]} />
+
+  <section class="container-site py-12 lg:py-16" aria-label="Daftar proyek">
+    <!-- Kontrol filter (progressive enhancement: tanpa JS semua proyek tetap tampil) -->
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between" data-project-controls>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filter kategori">
+        <button type="button" class="chip !px-3.5 !py-1.5 !text-sm" data-filter="all" aria-pressed="true">Semua <span class="opacity-70">({projects.length})</span></button>
+        {categories.map((c) => (
+          <button type="button" class="chip !px-3.5 !py-1.5 !text-sm" data-filter={c} aria-pressed="false">
+            {c} <span class="opacity-70">({projects.filter((p) => p.data.category === c).length})</span>
+          </button>
+        ))}
+      </div>
+      <div class="flex gap-2">
+        <div class="relative flex-1 lg:w-72">
+          <label for="project-search" class="sr-only">Cari proyek</label>
+          <Icon name="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+          <input id="project-search" type="search" placeholder="Cari proyek, teknologi…" class="field !pl-9" autocomplete="off" />
+        </div>
+        <label for="project-sort" class="sr-only">Urutkan</label>
+        <select id="project-sort" class="field !w-auto">
+          <option value="featured">Unggulan</option>
+          <option value="newest">Terbaru</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="mt-6 text-sm text-fg-muted" aria-live="polite" data-project-count></p>
+
+    <ul class="mt-4 grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-project-grid>
+      {projects.map((p, i) => (
+        <li data-reveal
+          data-slug={projectSlug(p)}
+          data-category={p.data.category}
+          data-year={p.data.year}
+          data-order={i}
+          data-featured={p.data.featured ? 1 : 0}
+          data-search={[p.data.title, p.data.subtitle, p.data.summary, p.data.client, p.data.category, ...p.data.tech, ...p.data.type].join(' ').toLowerCase()}>
+          <ProjectCard project={p} headingLevel="h2" eager={i < 3} />
+        </li>
+      ))}
+    </ul>
+    <p hidden data-project-empty class="card mt-4 p-10 text-center text-fg-muted">Tidak ada proyek yang cocok dengan filter/pencarian.</p>
+  </section>
+</BaseLayout>
+
+<script>
+  /**
+   * Filter kategori + pencarian + pengurutan di sisi klien.
+   * Pencarian memakai indeks Pagefind (full-text, hasil build) bila tersedia;
+   * fallback ke pencocokan teks sederhana (mis. saat `npm run dev`).
+   */
+  import { pagefindSearch } from '@/scripts/pagefind';
+
+  const grid = document.querySelector<HTMLUListElement>('[data-project-grid]')!;
+  const items = [...grid.querySelectorAll<HTMLLIElement>(':scope > li')];
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const search = document.querySelector<HTMLInputElement>('#project-search')!;
+  const sort = document.querySelector<HTMLSelectElement>('#project-sort')!;
+  const count = document.querySelector<HTMLElement>('[data-project-count]')!;
+  const empty = document.querySelector<HTMLElement>('[data-project-empty]')!;
+
+  const params = new URLSearchParams(location.search);
+  let category = params.get('kategori') ?? 'all';
+  let matches: Set<string> | null = null;
+  search.value = params.get('q') ?? '';
+  sort.value = params.get('urut') === 'terbaru' ? 'newest' : 'featured';
+
+  function apply() {
+    let visible = 0;
+    for (const li of items) {
+      const okCat = category === 'all' || li.dataset.category === category;
+      const okSearch = !matches || matches.has(li.dataset.slug!);
+      li.hidden = !(okCat && okSearch);
+      li.classList.add('is-visible');
+      if (!li.hidden) visible++;
+    }
+    const sorted = [...items].sort((a, b) =>
+      sort.value === 'newest'
+        ? Number(b.dataset.year) - Number(a.dataset.year) || Number(a.dataset.order) - Number(b.dataset.order)
+        : Number(b.dataset.featured) - Number(a.dataset.featured) || Number(a.dataset.order) - Number(b.dataset.order),
+    );
+    sorted.forEach((li) => grid.appendChild(li));
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === category)));
+    count.textContent = `Menampilkan ${visible} dari ${items.length} proyek`;
+    empty.hidden = visible > 0;
+
+    const url = new URL(location.href);
+    category === 'all' ? url.searchParams.delete('kategori') : url.searchParams.set('kategori', category);
+    search.value ? url.searchParams.set('q', search.value) : url.searchParams.delete('q');
+    sort.value === 'newest' ? url.searchParams.set('urut', 'terbaru') : url.searchParams.delete('urut');
+    history.replaceState(null, '', url);
+  }
+
+  let timer: number | undefined;
+  async function runSearch() {
+    const q = search.value.trim();
+    if (!q) { matches = null; return apply(); }
+    const slugs = await pagefindSearch(q, 'proyek');
+    if (slugs) {
+      matches = new Set(slugs.map((u) => u.split('/').filter(Boolean).pop()!));
+    } else {
+      const needle = q.toLowerCase();
+      matches = new Set(items.filter((li) => li.dataset.search!.includes(needle)).map((li) => li.dataset.slug!));
+    }
+    apply();
+  }
+
+  buttons.forEach((b) => b.addEventListener('click', () => { category = b.dataset.filter!; apply(); }));
+  search.addEventListener('input', () => { clearTimeout(timer); timer = window.setTimeout(runSearch, 180); });
+  sort.addEventListener('change', apply);
+  runSearch();
+</script>
