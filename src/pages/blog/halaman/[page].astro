@@ -15,7 +15,7 @@ const { all, last } = Astro.props;
 const current = Number(Astro.params.page);
 const posts = all.slice((current - 1) * POSTS_PER_PAGE, current * POSTS_PER_PAGE);
 ---
-<BaseLayout title={`Blog — Halaman ${current}`} description="Arsip artikel blog Cendera.">
+<BaseLayout title={`Blog — Halaman ${current}`} image="/og/pages/blog.png" description="Arsip artikel blog Cendera.">
   <BlogIndex title={`Blog — Halaman ${current}`} posts={posts} allPosts={all} crumbs={[{ label: 'Blog', href: '/blog' }]}
     page={{ current, last, base: '/blog', prev: current === 2 ? '/blog' : `/blog/halaman/${current - 1}`, next: current < last ? `/blog/halaman/${current + 1}` : undefined }} />
 </BaseLayout>

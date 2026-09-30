@@ -54,7 +54,7 @@ const breadcrumbLd = {
   ],
 };
 ---
-<BaseLayout title={d.title} description={d.description} image={`/og/blog/${post.id}.jpg`} imageAlt={d.coverAlt ?? d.title} type="article"
+<BaseLayout title={d.title} description={d.description} image={`/og/blog/${post.id}.png`} imageAlt={`${d.title} — ${SITE.name}`} type="article"
   publishedTime={d.date} modifiedTime={d.updated} author={d.author} tags={d.tags} jsonLd={[articleLd, breadcrumbLd]}>
   <article data-pagefind-body data-pagefind-filter="tipe:blog">
     <header class="relative isolate overflow-hidden border-b border-border">

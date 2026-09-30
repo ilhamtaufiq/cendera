@@ -280,9 +280,11 @@ Widget memakai mode `interaction-only`, jadi normalnya tidak terlihat sama sekal
 **Tautan share / canonical berakhiran `.html`.** Sudah ditangani: halaman dibangun sebagai `slug.html`
 (`build.format: 'file'`, agar tidak ada redirect trailing slash), dan semua URL publik dibersihkan lewat `src/lib/url.ts`.
 
-**Pratinjau (OG image) tidak muncul saat dibagikan.** Setiap artikel & proyek otomatis mendapat JPEG 1200×630
-di `/og/{blog,proyek}/<slug>.jpg` (dibuat `scripts/og-images.mjs` saat `prebuild` dari `cover`). Bila pratinjau lama
-masih tersimpan di platform, segarkan cache-nya:
+**Pratinjau (OG image) saat dibagikan.** Setiap artikel, proyek, dan halaman utama otomatis mendapat kartu PNG
+1200×630 bergaya kartu GitHub dengan identitas Cendera (domain/bagian, judul, deskripsi, kategori/tanggal/waktu baca
+atau tahun/status, chip tag/teknologi, logo). Dibuat oleh `scripts/og-images.mjs` saat `prebuild`/`predev` dengan
+Satori (font ikut dibawa, jadi hasil di server build sama dengan lokal) → `public/og/{blog,proyek,pages}/`.
+Ubah tampilannya di fungsi `card()` pada skrip tersebut. Bila pratinjau lama masih tersimpan di platform, segarkan cache-nya:
 [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/),
 [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/). WhatsApp menyimpan cache beberapa hari;
 untuk uji cepat tambahkan query, mis. `?v=2`.

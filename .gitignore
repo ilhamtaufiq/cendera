@@ -19,5 +19,5 @@ npm-debug.log*
 .DS_Store
 *.log
 
-# gambar OG hasil build (scripts/og-images.mjs)
+# gambar OG hasil build (scripts/og-images.mjs, kartu gaya GitHub)
 public/og/
