@@ -11,6 +11,7 @@ import BrandIcon from '@/components/ui/BrandIcon.astro';
 import '@/styles/prose.css';
 import { getProjects, projectSlug, type Project } from '@/lib/content';
 import { SITE } from '@/data/site';
+import { absoluteUrl } from '@/lib/url';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -27,7 +28,7 @@ const { project, projects } = Astro.props;
 const d = project.data;
 const { Content, headings } = await render(project);
 const related = d.related.map((r) => projects.find((p) => projectSlug(p) === r)!).filter(Boolean);
-const url = new URL(Astro.url.pathname, Astro.site).href;
+const url = absoluteUrl(Astro.url.pathname, Astro.site);
 
 const creativeWork = {
   '@context': 'https://schema.org',
@@ -45,7 +46,7 @@ const creativeWork = {
   ...(d.links.live ? { sameAs: d.links.live } : {}),
 };
 ---
-<BaseLayout title={`${d.title} — ${d.subtitle}`} description={d.summary} image={d.cover} imageAlt={d.coverAlt ?? d.title} jsonLd={creativeWork}>
+<BaseLayout title={`${d.title} — ${d.subtitle}`} description={d.summary} image={`/og/proyek/${projectSlug(project)}.png`} imageAlt={`${d.title} — ${SITE.name}`} jsonLd={creativeWork}>
   <article data-pagefind-body data-pagefind-filter="tipe:proyek">
     <PageHeader eyebrow={`${d.category} · ${d.type.join(' + ')}`} title={d.title} lead={d.subtitle} crumbs={[{ label: 'Proyek', href: '/proyek' }]}>
       <div class="mt-8 flex flex-wrap items-center gap-3">

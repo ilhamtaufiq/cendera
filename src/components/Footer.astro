@@ -53,7 +53,7 @@ const explore = [
         <ul class="mt-4 space-y-3 text-sm text-fg-muted">
           <li><a class="inline-flex items-center gap-2 hover:text-fg" href={`mailto:${CONTACT.email}`}><Icon name="mail" class="size-4" />{CONTACT.email}</a></li>
           <li><a class="inline-flex items-center gap-2 hover:text-fg" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><Icon name="phone" class="size-4" />{CONTACT.whatsappDisplay}</a></li>
-          <li class="inline-flex items-start gap-2"><Icon name="map-pin" class="size-4 mt-0.5 shrink-0" />{CONTACT.address.city}, {CONTACT.address.region}</li>
+          <li class="inline-flex items-start gap-2"><Icon name="map-pin" class="size-4 mt-0.5 shrink-0" /><span>{CONTACT.address.street}, {CONTACT.address.village}, {CONTACT.address.district}, Cianjur</span></li>
         </ul>
       </div>
     </nav>

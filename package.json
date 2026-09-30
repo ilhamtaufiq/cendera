@@ -5,9 +5,11 @@
   "type": "module",
   "description": "Situs company profile Cendera — Astro + Markdown di Git, dijalankan di Cloudflare Workers.",
   "scripts": {
+    "predev": "node scripts/og-images.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/og-images.mjs",
     "build": "astro build && node scripts/postbuild.mjs",
-    "preview": "astro build && node scripts/postbuild.mjs && wrangler dev",
+    "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "check": "astro check",
     "images": "node scripts/generate-images.mjs",
@@ -21,19 +23,24 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
     "@lucide/astro": "^1.49.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
     "rehype-autolink-headings": "^7.1.0",
+    "satori": "^0.33.5",
+    "sharp": "^0.35.5",
     "simple-icons": "^16.33.0",
     "tailwindcss": "^4.3.3",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "pagefind": "^1.5.2",
     "potrace": "^2.1.8",
-    "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "wrangler": "^4.144.0"
   }

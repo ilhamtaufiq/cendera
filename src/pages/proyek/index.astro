@@ -10,7 +10,7 @@ import { PROJECT_CATEGORIES } from '@/content.config';
 const projects = await getProjects();
 const categories = PROJECT_CATEGORIES.filter((c) => projects.some((p) => p.data.category === c));
 ---
-<BaseLayout title="Proyek" description="Portofolio Cendera: aplikasi govtech, sistem bisnis, aplikasi mobile, dan web yang kami bangun dan rawat.">
+<BaseLayout title="Proyek" image="/og/pages/proyek.png" description="Portofolio Cendera: aplikasi govtech, sistem bisnis, aplikasi mobile, dan web yang kami bangun dan rawat.">
   <PageHeader eyebrow="Portofolio" title="Proyek & studi kasus"
     lead="Sistem yang kami rancang, bangun, dan rawat — lengkap dengan tantangan, solusi, dan hasilnya." crumbs={[]} />
 

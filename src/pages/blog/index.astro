@@ -8,7 +8,7 @@ import { POSTS_PER_PAGE } from '@/data/site';
 const all = await getPosts();
 const last = Math.max(1, Math.ceil(all.length / POSTS_PER_PAGE));
 ---
-<BaseLayout title="Blog" description="Artikel teknologi, studi kasus, dan tips dari tim Cendera seputar pengembangan aplikasi, govtech, dan industri kreatif.">
+<BaseLayout title="Blog" image="/og/pages/blog.png" description="Artikel teknologi, studi kasus, dan tips dari tim Cendera seputar pengembangan aplikasi, govtech, dan industri kreatif.">
   <BlogIndex title="Catatan dari dapur Cendera" lead="Pelajaran teknis, studi kasus, dan tips yang kami temukan saat membangun produk digital."
     posts={all.slice(0, POSTS_PER_PAGE)} allPosts={all}
     page={{ current: 1, last, base: '/blog', next: last > 1 ? '/blog/halaman/2' : undefined }} />

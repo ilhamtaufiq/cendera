@@ -7,11 +7,24 @@ export const SITE = {
   legalName: 'Cendera', // PLACEHOLDER: mis. "PT Cendera Teknologi Kreatif"
   tagline: 'Teknologi • Aplikasi • Kreatif',
   description:
-    'Cendera adalah studio teknologi dan kreatif yang membangun aplikasi mobile, web, sistem bisnis, dan solusi govtech — dari ide hingga produk yang benar-benar dipakai.',
+    'Cendera, studio teknologi & kreatif di Cianjur: jasa pembuatan aplikasi mobile, website, sistem bisnis (ERP/POS), solusi govtech, UI/UX, dan branding.',
+  // Judul & kata kunci SEO beranda (lokal: Cianjur)
+  homeTitle: 'Cendera — Jasa Pembuatan Aplikasi, Website & Sistem Informasi di Cianjur',
+  keywords: [
+    'jasa pembuatan aplikasi',
+    'jasa pembuatan website',
+    'aplikasi mobile',
+    'sistem informasi pemerintah',
+    'govtech',
+    'ERP',
+    'UI/UX design',
+    'branding',
+  ],
   locale: 'id-ID',
   lang: 'id',
   foundingYear: 2021, // PLACEHOLDER
-  ogImage: '/images/og-default.png',
+  // Kartu OG dibuat saat build oleh scripts/og-images.mjs
+  ogImage: '/og/pages/home.png',
   logo: '/images/brand/cendera-logo.svg',
   themeColor: '#0A0A0A',
 } as const;
@@ -22,14 +35,18 @@ export const CONTACT = {
   whatsappDisplay: '+62 812-0000-0000', // PLACEHOLDER
   whatsappMessage: 'Halo Cendera, saya ingin berdiskusi tentang proyek.',
   address: {
-    street: 'Jl. Contoh No. 00', // PLACEHOLDER
-    city: 'Cianjur',
+    street: 'Bumi Marhamah Blok P2 No. 7',
+    village: 'Sindangasih',
+    district: 'Karangtengah',
+    city: 'Kabupaten Cianjur',
     region: 'Jawa Barat',
-    postalCode: '43200', // PLACEHOLDER
+    postalCode: '43281', // periksa kembali kode pos
     country: 'ID',
   },
-  // PLACEHOLDER — ganti dengan koordinat & tautan Google Maps kantor Anda.
-  mapUrl: 'https://maps.google.com/?q=Cianjur,+Jawa+Barat',
+  // Ganti dengan tautan "Bagikan" dari Google Maps (pin tepat) bila sudah ada.
+  mapUrl:
+    'https://www.google.com/maps/search/?api=1&query=' +
+    encodeURIComponent('Bumi Marhamah Blok P2 No. 7, Sindangasih, Karangtengah, Cianjur, Jawa Barat'),
   hours: [
     { days: 'Senin – Jumat', time: '09.00 – 17.00 WIB' },
     { days: 'Sabtu', time: '09.00 – 13.00 WIB' },

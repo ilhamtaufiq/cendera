@@ -4,9 +4,10 @@ import Icon from '@/components/ui/Icon.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
 import { NAV, SITE } from '@/data/site';
 import { useTranslations } from '@/i18n/ui';
+import { cleanPath } from '@/lib/url';
 
 const t = useTranslations();
-const path = Astro.url.pathname;
+const path = cleanPath(Astro.url.pathname);
 const isCurrent = (href: string) => !href.includes('#') && (path === href || path.startsWith(href + '/'));
 ---
 <header data-header class="site-header sticky top-0 z-50 border-b border-transparent transition-colors">

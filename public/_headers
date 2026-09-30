@@ -1,4 +1,5 @@
 # Header cache & keamanan untuk Workers Static Assets.
+# "! Cache-Control" melepas nilai dari aturan /* agar tidak tergabung (dobel) dengan aturan spesifik.
 # https://developers.cloudflare.com/workers/static-assets/headers/
 # Catatan: placeholder CSP di bawah diganti otomatis oleh scripts/postbuild.mjs (menambahkan hash script inline).
 
@@ -14,20 +15,31 @@
 
 # Aset ber-hash dari Astro/Vite → immutable
 /_astro/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 # Indeks pencarian Pagefind (berubah tiap build, nama file ber-hash untuk fragmen)
 /pagefind/*
+  ! Cache-Control
   Cache-Control: public, max-age=3600
+
+# Gambar Open Graph (dibuat saat build)
+/og/*
+  ! Cache-Control
+  Cache-Control: public, max-age=86400
 
 # Gambar & font statis
 /images/*
+  ! Cache-Control
   Cache-Control: public, max-age=604800, stale-while-revalidate=86400
 
 /favicon.svg
+  ! Cache-Control
   Cache-Control: public, max-age=604800
 /favicon.ico
+  ! Cache-Control
   Cache-Control: public, max-age=604800
 
 /rss.xml
+  ! Cache-Control
   Cache-Control: public, max-age=0, s-maxage=900

@@ -40,6 +40,8 @@ async function renderWidget(form: HTMLFormElement) {
     action: slot.dataset.action,
     theme,
     size: 'flexible',
+    // Widget hanya tampil bila Cloudflare benar-benar butuh interaksi pengguna.
+    appearance: 'interaction-only',
     language: 'id',
   });
 }
